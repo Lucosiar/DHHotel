@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{% static 'styles.css' %}">
+    <title>Login DH Hotel</title>
+</head>
+<body>
+    <h2>Login</h2>
+    <form method="POST" action="{% url 'login' %}">
+        {% csrf_token %}
+        <div>
+            <label for="email">Correo electrónico:</label>
+            <input type="text" id="email" name="email" required>
+        </div>
+        <div>
+            <label for="password">Contraseña:</label>
+            <input type="password" id="password" name="password" required>
+        </div>
+        <button type="submit">Iniciar Sesión</button>
+    </form>
+
+    <p>¿No tienes cuenta? Administrador <a href="{% url 'signup_administrator' %}">Regístrate aquí</a></p>
+    <p>¿No tienes cuenta? Cliente <a href="{% url 'signup_client' %}">Regístrate aquí</a></p>
+
+</body>
+</html>
