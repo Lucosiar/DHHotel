@@ -1,0 +1,48 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+
+.min-h-screen{
+    min-height: 90vh;
+    min-width: 90vh;
+    border: 2px solid red;
+    
+}
+
+.home-container {
+    min-height: 100vh; /* 100% de la altura de la ventana */
+    width: 100%;       /* 100% del ancho */
+  }
+  
+
+  .home-footer{
+    background-color: #005f73;
+    color: white;
+    padding: 1rem;
+    border: 2px solid chocolate;
+  }
+  
+  .home-main {
+    flex: 1; /* Ocupa todo el espacio disponible entre el header y el footer */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    background-image: url("/path-to-image.jpg"); /* Cambia esta ruta a la imagen que desees */
+    background-size: cover;
+    background-position: center;
+    color: white;
+    border: 2px solid green;
+  }
+  
+  .hero h2 {
+    font-size: 2rem;
+    margin-bottom: 1rem;
+  }
+  
+  .hero p {
+    font-size: 1.2rem;
+    margin-bottom: 2rem;
+  }
+  
