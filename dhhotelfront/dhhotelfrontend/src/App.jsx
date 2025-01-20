@@ -2,6 +2,7 @@ import './App.css'
 import {BrowserRouter, Routes, Route} from 'react-router-dom'
 import HomePrincipal from './pages/HomePrincipal.jsx'
 import Login from './pages/Registration/Login.jsx'
+import './assets/css/fonts.css'
 
 
 function App() {

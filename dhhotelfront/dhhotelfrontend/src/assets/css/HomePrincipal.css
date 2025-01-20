@@ -2,47 +2,274 @@
 @tailwind components;
 @tailwind utilities;
 
+/*Paleta rosa: 
+#EB7070
+#F5A4A4
+#F5B8B8
+#F8CECE*/
+
+/*#33CA7F*/
+
+/*#A594F9 
+A1C181
+#6EFAFB
+0091AD
+#6EFAFB
+5CE4FF*/
+
 
 .min-h-screen{
-    min-height: 90vh;
-    min-width: 90vh;
-    border: 2px solid red;
+  min-height: 90vh;
+  min-width: 90vh;
     
 }
 
-.home-container {
-    min-height: 100vh; /* 100% de la altura de la ventana */
-    width: 100%;       /* 100% del ancho */
-  }
-  
+body p{
+  color: black;
+  font-size: 1.1rem;
+}
 
-  .home-footer{
-    background-color: #005f73;
-    color: white;
-    padding: 1rem;
-    border: 2px solid chocolate;
-  }
+.background-image {
+  transform: translateY(-150px);
+}
+
+.The_Last_Shuriken_leter{
+  font-family: 'The_Last_Shuriken', The_Last_Shuriken;
+}
+
+.home-main {
+  display:flex;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.font-p-grande{
+  font-size: 6rem;
+
+}
+
+.text-container {
+  text-align: center;
+}
+
+.absolute img {
+  filter: brightness(0.7);
+}
+
+.size-image {
+  width: 150px;
+  height: auto;
+  max-width: 100%;
+  min-height: 100vh;
+
+}
+
+.first-section {
+  display: flex;
+  flex-direction: column;
+  text-align: center;
+  justify-content: flex-start;
+  color: white;
+  margin-bottom: 5%;
+  margin-top:15%;
+}
+
+.first-section h1 {
+  font-size: 5rem;
+  margin-bottom: 1rem;
+}
+
+.first-section h2 {
+  font-size: 2rem;
+  margin-bottom: 1rem;
+}
+
+.first-section p {
+  font-size: 1rem;
+  margin-left: 30rem;
+  margin-right: 30rem;
+}
+
+.seach-room {
+  text-align: center;
+  background-color: white;
+  border-radius: 8px;
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  max-width: 900px;
+  margin: 0 auto;
+  gap: 1rem;
+  box-sizing: border-box;
+  margin-bottom: 5%;
+}
+
+.table-seach-room {
   
-  .home-main {
-    flex: 1; /* Ocupa todo el espacio disponible entre el header y el footer */
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    background-image: url("/path-to-image.jpg"); /* Cambia esta ruta a la imagen que desees */
-    background-size: cover;
-    background-position: center;
-    color: white;
-    border: 2px solid green;
-  }
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  grid-template-rows: auto auto;
+  gap: 1rem;
+  margin: auto;
+  width: 100%;
+}
+
+.seach-room p {
+  font-size: 1rem;
+  margin: 0;
+}
+
+.seach-room input {
+  padding: 0.5rem;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.seach-room button {
+  color: white;
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.seach-room button:hover {
+  background-color: #e38a00;
+}
+
+.info-hotel h1{
+  color: black;
+  text-align: center;
+  font-size: 3rem;
+  margin-top: 1rem;
+}
+
+
+.type-rooms h1{
+  color: black;
+  text-align: center;
+  font-size: 3rem;
+  margin-top: 1rem;
   
-  .hero h2 {
-    font-size: 2rem;
-    margin-bottom: 1rem;
-  }
+}
+
+.type-rooms p{
+  color: black;
+  text-align: center;
+  margin-bottom: 2rem;
   
-  .hero p {
-    font-size: 1.2rem;
-    margin-bottom: 2rem;
-  }
   
+}
+
+.type-rooms-container {
+  display: flex;
+  justify-content: space-around;
+  gap: 1rem;
+  padding: 1rem;
+  border-radius: 8px;
+}
+
+.room-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  /*background-color: #fccece;*/
+  background-color: rgba(76, 0, 130, 0.112);
+
+  padding: 1rem;
+  border-radius: 8px;
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.room-container h3 {
+  margin-top: 1rem;
+  font-size: 1.25rem;
+  color: #333;
+}
+
+.room-container h4 {
+  margin-top: 0.5rem;
+  font-size: 1rem;
+  color: #777;
+}
+
+.button-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.reserve-button {
+  background-color: #f04f14;
+  color: white;
+  padding: 10px 20px;
+  font-size: 16px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.room-container:hover .button-overlay {
+  opacity: 1;
+}
+
+.room-container:hover .reserve-button {
+  background-color: #f04f14;
+}
+
+.size-image_room{
+  width: 100%;
+  max-width: 600px;
+  min-height: 40vh;
+  border-radius: 8px;
+}
+
+.book-now{
+  color: white;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.book-now h1{
+  color: black;
+  text-align: center;
+  font-size: 3rem;
+  margin-top: 1rem;
+}
+
+.about-us h1{
+  color: black;
+  text-align: center;
+  font-size: 3rem;
+  margin-top: 1rem;
+}
+
+.about-us p{
+  color: black;
+  text-align: center;
+}
+
+.footer{
+  background-color: indigo;
+}
+
+
+.home-footer{
+  background-color: #02697d;
+  color: white;
+  padding: 1rem;
+}
