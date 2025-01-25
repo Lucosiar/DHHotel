@@ -89,11 +89,14 @@ body p{
   font-size: 1rem;
   margin-left: 30rem;
   margin-right: 30rem;
+  color:white;
 }
 
 .seach-room {
   text-align: center;
-  background-color: white;
+  background-color: #A5B5FC;
+  /* #A5B5FC 
+  818CF8*/
   border-radius: 8px;
   padding: 1.5rem;
   display: flex;
@@ -124,7 +127,7 @@ body p{
 
 .seach-room input {
   padding: 0.5rem;
-  border: 1px solid #ddd;
+  border: 1px solid #818CF8;
   border-radius: 4px;
 }
 
@@ -145,6 +148,13 @@ body p{
   color: black;
   text-align: center;
   font-size: 3rem;
+  margin-top: 1rem;
+}
+
+.info-hotel h3{
+  color: black;
+  text-align: center;
+  font-size: 1.3rem;
   margin-top: 1rem;
 }
 
