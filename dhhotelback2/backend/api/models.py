@@ -29,7 +29,7 @@ class User(models.Model):
 
 class Client(models.Model):
     idCliente = models.AutoField(primary_key=True)
-    idUserFK = models.ForeignKey(User, on_delete=models.CASCADE, db_column='idUserFK')
+    idUserFK = models.ForeignKey(User, on_delete=models.CASCADE, db_column='idUserFK', related_name='clients')
     lastName = models.CharField(max_length=50)
     phone = models.CharField(max_length=12)
     city = models.CharField(max_length=50)
@@ -58,24 +58,40 @@ class Room(models.Model):
 
 # Reservas
 class Booking(models.Model):
+    STATE = [
+        ('pendiente', 'Pendiente'),
+        ('confirmada', 'Confirmada'), 
+        ('cancelada', 'Cancelada'),
+    ]
+    
     idBooking = models.AutoField(primary_key=True)
     idClientFK = models.ForeignKey(Client, on_delete=models.CASCADE, db_column='idClientFK')
     idRoomFK = models.ForeignKey(Room, on_delete=models.CASCADE, db_column='idRoomFK')
     startDate = models.DateField()
     endDate = models.DateField()
-    state = models.CharField(max_length=20)
+    state = models.CharField(max_length=10, choices=STATE)
 
     class Meta:
         db_table = 'booking'
 
 # Pagos
 class Payment(models.Model):
+    METODO_PAGO = [
+        ('efectivo', 'Efectivo'),
+        ('tarjeta', 'Tarjeta de Crédito o Débitp'),
+    ]
+
+    STATE = [
+        ('pendiente', 'Pendiente'),
+        ('confirmada', 'Confirmada'),
+    ]
+
     idPayment = models.AutoField(primary_key=True)
     idBooking = models.ForeignKey(Booking, on_delete=models.CASCADE)
     amount = models.IntegerField()
     paymentDate = models.DateField()
-    paymentMethod = models.CharField(max_length=45)
-    state = models.CharField(max_length=20)
+    paymentMethod = models.CharField(max_length=8, choices=METODO_PAGO)
+    state = models.CharField(max_length=10, choices=STATE)
 
     class Meta:
         db_table = 'payment'

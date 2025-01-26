@@ -4,54 +4,23 @@
     justify-content: space-around;
     padding: 20px;
     height: 15vh;
+    margin-top: 20px;
 }
+
 
 .card {
     background-color: #f9f9f9;
     border: 1px solid #ddd;
     border-radius: 8px;
-    padding: 40px 20px; /* Espacio interno más grande */
+    padding: 40px 20px;
     text-align: center;
     cursor: pointer;
     transition: box-shadow 0.3s ease;
-    width: 250px; /* Ajuste del ancho */
+    width: 250px;
     display: flex;
     flex-direction: column;
-    justify-content: center; /* Alineación vertical centrada dentro del recuadro */
-}
-
-.card:hover {
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-}
-
-.card h3 {
-    margin: 0;
-    color: #333;
-}
-
-
-/* Gestion.css */
-.container {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding: 20px;
-    height: 80vh; /* Altura del contenedor */
-}
-
-.card {
-    background-color: #f9f9f9;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    padding: 40px 20px; /* Espacio interno más grande */
-    text-align: center;
-    cursor: pointer;
-    transition: box-shadow 0.3s ease;
-    width: 250px; /* Ajuste del ancho */
-    display: flex;
-    flex-direction: column;
-    justify-content: center; /* Alineación vertical centrada dentro del recuadro */
-    margin: 10px; /* Espacio entre recuadros */
+    justify-content: center;
+    margin: 10px;
 }
 
 .card:hover {
@@ -82,12 +51,62 @@ th, td {
     padding: 12px;
     text-align: left;
 }
-
-th {
-    background-color: #f4f4f4;
-    color:black;
+.table-container H2{
+    font-size: 2rem;
+    text-align: center;
 }
 
-tbody tr:hover {
+
+.container-specific{
+    display: flex;
+    justify-content: center;
+    height: 10vh;
+    margin:20px;
+}
+
+.buttons-specific{
     background-color: #f9f9f9;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    text-align: center;
+    cursor: pointer;
+    transition: box-shadow 0.3s ease;
+    width: 200px;
+    justify-content: center;
+    margin: 10px;
+    color: black;
+}
+
+.form-group{
+    width: 99%;
+    text-align: center;
+    align-items: center;
+    justify-content: center;
+    margin: 10px;
+    color: black;
+    padding: 15px;
+
+}
+
+.input-form{
+    background-color: transparent;
+    padding: 5px;
+    border-radius: 8px;
+    border: 1px solid #ddd;
+    margin-left: 10px;
+    margin-bottom: 10px;
+    width: 200px;
+}
+
+.buttons-create-room{
+    background-color: #f9f9f9;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    text-align: center;
+    cursor: pointer;
+    transition: box-shadow 0.3s ease;
+    width: 200px;
+    justify-content: center;
+    margin: 10px;
+    color: black;
 }

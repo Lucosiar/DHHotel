@@ -69,6 +69,13 @@ class UserViewSet(viewsets.ModelViewSet):
         else:
             return Response(serializer.errors, status=400)
 
+    # GET users/clients/
+    @action(detail=False, methods=['get'])
+    def clients(self, request):
+        clients = User.objects.filter(rol='client')  # Filtrar por rol
+        serializer = self.get_serializer(clients, many=True)
+        return Response(serializer.data)
+
 ## /clients/
 class ClientViewSet(viewsets.ModelViewSet):
     queryset = Client.objects.all()
