@@ -7,6 +7,7 @@ from django.contrib.auth.hashers import check_password
 from django.utils import timezone
 from rest_framework.views import APIView
 from rest_framework.permissions import AllowAny
+from rest_framework import status
 from django.contrib.auth import authenticate
 from .models import Room, Booking, Payment, Client, User
 from .serializers import RoomSerializer, BookingSerializer, PaymentSerializer, ClientSerializer, UserSerializer
@@ -154,12 +155,19 @@ class RoomViewSet(viewsets.ModelViewSet):
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    # DELETE rooms/<id>/
-    @action(detail=True, methods=['delete'])
-    def delete_room(self, request, pk=None):
-        room = self.get_object()
-        room.delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
+    # DELETE rooms/<room_number>/
+    @action(detail=False, methods=['delete'])
+    def delete_room_by_number(self, request):
+        room_number = request.query_params.get('number')
+        if not room_number:
+            return Response({"error": "Debe proporcionar un número de habitación."}, status=status.HTTP_400_BAD_REQUEST)
+        
+        try:
+            room = Room.objects.get(number=room_number)
+            room.delete()
+            return Response({"message": f"Habitación {room_number} eliminada correctamente."}, status=status.HTTP_204_NO_CONTENT)
+        except Room.DoesNotExist:
+            return Response({"error": f"No se encontró la habitación con el número {room_number}."}, status=status.HTTP_404_NOT_FOUND)
 
     # PUT rooms/<id>/
     @action(detail=True, methods=['put'])
@@ -171,6 +179,18 @@ class RoomViewSet(viewsets.ModelViewSet):
             return Response(serializer.data, status=status.HTTP_200_OK)
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    # PUT rooms/<id>/update_state/
+    @action(detail=True, methods=['put'])
+    def update_state(self, request, pk=None):
+        room = self.get_object()
+        new_state = request.data.get("state")
+        if new_state not in ["disponible", "ocupada", "mantenimiento"]:
+            return Response({"error": "Estado inválido."}, status=status.HTTP_400_BAD_REQUEST)
+        room.state = new_state
+        room.save()
+        return Response({"message": "Estado actualizado correctamente."}, status=status.HTTP_200_OK)
+
 
 ################
 ### Reservas ###

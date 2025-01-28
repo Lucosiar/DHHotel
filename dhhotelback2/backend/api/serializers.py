@@ -24,6 +24,11 @@ class RoomSerializer(serializers.ModelSerializer):
         model = Room
         fields = '__all__'
 
+    def validate_number(self, value):
+        if Room.objects.filter(number=value).exists():
+            raise serializers.ValidationError("El número ya está en uso.")
+        return value
+
 class BookingSerializer(serializers.ModelSerializer):
     user_name = serializers.CharField(source='idClientFK.idUserFK.name', read_only=True)
     client_lastname = serializers.CharField(source='idClientFK.lastName', read_only=True)
