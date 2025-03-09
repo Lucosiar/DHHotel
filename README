@@ -1,4 +1,65 @@
 FRONT -> dhhotelfront
-BACK -> dhhotel2
+BACK -> dhhotelback2
 
-Faltan modificaciones ya que el front fue añadido posteriormente.
+# Gestor de hoteles
+## Sobre el proyecto
+La idea inicial del proyecto fue dada por Nacho (https://github.com/Deharotech/DHHotel.git), propuso crear una api para la gestión de un hotel. 
+Con el manejo de reservas, habitaciones, pagos, clientes y adminstradores. Mientras planeaba como hacer la api decidí hacer el front y hacer una aplicación completa.
+Este fue el resultado.
+
+## Vídeo
+
+## Como usarlo
+Una vez que tengas ejecutado el front y el back podrás acceder a la lading page. Donde puedes ver la información del hotel y reservar o mirar la disponibilidad del hotel.
+Puedes registrarte e iniciar sesión para gestionar tus reservas y pagos.
+Si inicias sesión como administrador podrás gestionar las habitaciones (crear habitaciones, elimininarlas, editar habitaciones y sus estados), pagos, y si 
+eres un superadministrador podrías llegar a gestionar a los administradores. Hay acciones que solo un superadministrador puede hacer.
+
+## Tecnologías usadas
+Front -> React con Vite
+Back -> Django
+BBDD -> MySQL
+
+## Como instalarlo y ejecutar
+Es necesario iniciar por separado, el front por un lado y por el otro el backend. Esta predefinida la url "http://127.0.0.1:8000/" 
+para el backend y "http://localhost:5173" para el frontend.
+
+### Backend
+1. Clona este repositorio:
+
+        git clone
+
+2. Navega al directorio del proyecto:
+
+        cd backend
+
+3. Crea y activa un entorno virtual:
+
+        Windows: python -m venv venv
+        Mac/Linux: python3 -m venv venv
+
+        Windows: venv\Scripts\activate
+        Max/Linux: source venv/bin/activate
+   
+4. Instale las dependencias:
+
+        Windows: pip install -r requirements.txt
+        Linux/Mac: pip install -r requirements.txt
+        
+5. Ejecuta el servidor Django:
+
+        python manage.py runserver
+
+### Frontend
+1. Navega hasta el directorio del proyecto:
+        cd dhhotelfrontend
+
+2. Ejecuta el servidor de React
+        npm run dev
+3. Verifica la url
+Te saldrá algo como esto una vez que ejecutes el proyecto:
+
+        Local:   http://localhost:5173/
+
+## Directrices de contribución
+¡Siéntase libre de contribuir a este proyecto! Cree un pull request con los cambios o mejoras que propone.😊💕
