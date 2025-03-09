@@ -169,6 +169,7 @@ const RoomsTable = () => {
       <div className="container-specific m-5">
         {userRole === "superadmin" && (
           <>
+            <button className="buttons-specific" onClick={() => setShowFilter(true)}>Filtrar</button>
             <button className="buttons-specific" onClick={() => setShowCreateForm(true)}>Crear nueva habitación</button>
             <button className="buttons-specific" onClick={() => setShowEditForm(true)}>Editar habitación</button>
             <button className="buttons-specific" onClick={handleOpenDeletePopup}>Eliminar habitación</button>
@@ -196,22 +197,23 @@ const RoomsTable = () => {
         {/*Filtrar por: Número (ascendente / descendente), tipo, y estado. (mirar como hacerlo) */}
       </div>
       
-      <table>
-        <thead>
-          <tr>
-            <th>Número</th>
-            <th>Tipo</th>
-            <th>Precio</th>
-            <th>Estado</th>
-          </tr>
+      <table className="w-full border-0">
+        <thead className="bg-indigo-700 text-white rounded-t-lg">
+        <tr>
+          <th className="p-2 first:rounded-tl-lg last:rounded-tr-lg border-0">Número</th>
+          <th className="p-2 border-0">Tipo</th>
+          <th className="p-2 border-0">Precio</th>
+          <th className="p-2 last:rounded-tr-lg border-0">Estado</th>
+        </tr>
         </thead>
-        <tbody>
+        <tbody className="bg-gray-800 text-white">
+
           {rooms.map((room) => (
             <tr key={room.idRoom}>
-              <td>{room.number}</td>
-              <td>{room.typeRoom}</td>
-              <td>{room.price}</td>
-              <td>
+              <td className="border-0">{room.number}</td>
+              <td className="border-0">{room.typeRoom}</td>
+              <td className="border-0">{room.price}</td>
+              <td className="border-0">
                 {isEditing ? (
                   <select
                     value={editedRooms[room.idRoom] || room.state}

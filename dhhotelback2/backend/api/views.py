@@ -33,24 +33,20 @@ class UserViewSet(viewsets.ModelViewSet):
     def create_user(self, request):
         serializer = self.get_serializer(data=request.data)
         if serializer.is_valid():
-            user = serializer.save()
-            if user.rol == 'client':
-                client_data = {
-                    'idUserFK': user.idUser,
-                    'lastName': request.data.get('lastName'),
-                    'phone': request.data.get('phone'),
-                    'city': request.data.get('city'),
-                    'state': request.data.get('state'),
-                    'country': request.data.get('country')
-                }
-                client_serializer = ClientSerializer(data=client_data)
-                if client_serializer.is_valid():
-                    client_serializer.save()
-                else:
-                    return Response(client_serializer.errors, status=400)
-            return Response(serializer.data)
+            # Verifica si el correo ya existe
+            email = request.data.get('email')
+            if User.objects.filter(email=email).exists():
+                return Response({"error": "El correo ya está registrado"}, status=400)
+
+            user = serializer.save()  # Crear el usuario
+            response_data = serializer.data
+            response_data["idUser"] = user.idUser  # Devolver el id del usuario
+
+            return Response(response_data, status=201)
         else:
             return Response(serializer.errors, status=400)
+
+
 
     # DELETE users/<id>/
     @action(detail=True, methods=['delete'])
@@ -89,14 +85,30 @@ class ClientViewSet(viewsets.ModelViewSet):
         return Response(serializer.data)
 
     # POST clients/create_client/
-    @action(detail=True, methods=['post'])
-    def create_client(self, request, pk=None):
-        serializer = self.get_serializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data)
+    @action(detail=False, methods=['post'])
+    def create_client(self, request):
+        user_id = request.data.get('idUser')  # Obtenemos el idUser del cliente
+        try:
+            user = User.objects.get(idUser=user_id)  # Buscamos el usuario con el idUser
+        except User.DoesNotExist:
+            return Response({"error": "El usuario no existe"}, status=400)
+
+        client_data = {
+            'idUserFK': user.idUser,  # Asignamos el idUser como clave foránea
+            'lastName': request.data.get('lastName'),
+            'phone': request.data.get('phone'),
+            'city': request.data.get('city'),
+            'state': request.data.get('state'),
+            'country': request.data.get('country'),
+        }
+
+        client_serializer = ClientSerializer(data=client_data)
+        if client_serializer.is_valid():
+            client_serializer.save()  # Creamos el cliente
+            return Response(client_serializer.data, status=201)
         else:
-            return Response(serializer.errors, status=400)
+            return Response(client_serializer.errors, status=400)
+
 
     # DELETE clients/<id>/
     @action(detail=True, methods=['delete'])

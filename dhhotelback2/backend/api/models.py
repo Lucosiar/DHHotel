@@ -29,7 +29,7 @@ class User(models.Model):
 
 class Client(models.Model):
     idCliente = models.AutoField(primary_key=True)
-    idUserFK = models.ForeignKey(User, on_delete=models.CASCADE, db_column='idUserFK', related_name='clients')
+    idUserFK = models.ForeignKey(User, on_delete=models.CASCADE, db_column='idUser', related_name='clients')
     lastName = models.CharField(max_length=50)
     phone = models.CharField(max_length=12)
     city = models.CharField(max_length=50)

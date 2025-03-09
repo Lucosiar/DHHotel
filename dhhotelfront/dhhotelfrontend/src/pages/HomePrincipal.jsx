@@ -66,7 +66,7 @@ const HomePrincipal = () => {
           <li>
             <button onClick={handleLogin} 
             className={`text-white border border-gray-300 px-4 py-1 text-xl cursor-pointer rounded-md hover:bg-orange-600 transition-colors duration-600 ${
-            isScrolled ? "bg-orange-500 border-orange-500" : "bg-transparent"
+            isScrolled ? "bg-indigo-800 border-indigo-800" : "bg-transparent"
             }`}>
               Iniciar Sesión
             </button>
@@ -106,7 +106,7 @@ const HomePrincipal = () => {
               id="adults" 
               min="1" max="8"/>
           </div>  
-          <button className="bg-orange-400">Buscar</button>
+          <button className="bg-indigo-700">Buscar</button>
         </div>
       </section>
 
@@ -207,7 +207,7 @@ const HomePrincipal = () => {
             </div>
             <div className="text-center">
               <button 
-                className="w-full bg-orange-400 text-white font-bold py-2 px-4 rounded-md hover:bg-orange-500"
+                className="w-full bg-indigo-700 text-white font-bold py-2 px-4 rounded-md hover:bg-orange-500"
               >
                 Enviar propuesta
               </button>

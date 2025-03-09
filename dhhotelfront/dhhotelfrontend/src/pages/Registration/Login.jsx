@@ -1,8 +1,11 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { Link } from 'react-router-dom';
+
 
 const Login = () => {
   const navigate = useNavigate();
+  const [error, setError] = useState(false);
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -25,14 +28,15 @@ const Login = () => {
     console.log(data);
 
     if (response.ok) {
-      // Redirigir según el tipo de usuario
+      setError(false);
       if (data.userRole === 'admin' || data.userRole === 'superadmin') {
         navigate('/admin');
       } else {
         navigate('/client');
       }
     } else {
-      console.log('Error en el login', data);
+      setError(true);
+      //console.log('Error en el login', data);
     }
   };
 
@@ -73,8 +77,9 @@ const Login = () => {
                   type="email"
                   name="email"
                   id="email"
-                  className="bg-gray-700 border border-gray-600 text-white rounded-lg 
-                  focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5"
+                  className={`bg-gray-700 border ${
+                    error ? "border-red-500" : "border-gray-600"
+                  } text-white rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5`}
                   placeholder="name@company.com"
                   required
                 />
@@ -91,10 +96,14 @@ const Login = () => {
                   name="password"
                   id="password"
                   placeholder="••••••••"
-                  className="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5"
+                  className={`bg-gray-700 border ${
+                    error ? "border-red-500" : "border-gray-600"
+                  } text-white rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5`}
                   required
                 />
               </div>
+
+              {error && <p className="text-red-500 text-sm">Correo o contraseña incorrectos</p>}
 
               <div className="flex items-center justify-between">
                 <a
@@ -106,18 +115,18 @@ const Login = () => {
               </div>
               <button
                 type="submit"
-                className="w-full text-white bg-orange-500 hover:bg-orange-700 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center"
+                className="w-full text-white bg-indigo-700 hover:bg-orange-700 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center"
               >
                 Iniciar sesión
               </button>
               <p className="text-sm font-light text-gray-400">
                 ¿No tienes cuenta todavía?{" "}
-                <a
-                  href="#"
+                <Link
+                  to="/singup"
                   className="font-medium text-primary-500 hover:underline"
                 >
-                  Registrate
-                </a>
+                  Regístrate
+                </Link>
               </p>
             </form>
           </div>

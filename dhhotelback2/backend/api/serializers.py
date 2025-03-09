@@ -14,10 +14,10 @@ class UserSerializer(serializers.ModelSerializer):
         fields = '__all__'
         extra_kwargs = {'password': {'write_only': True}}
 
-        def validate_email(self, value):
-            if User.objects.filter(email=value).exists():
-                raise serializers.ValidationError("El email ya está en uso.")
-            return value
+    def validate_email(self, value):
+        if User.objects.filter(email=value).exists():
+            raise serializers.ValidationError("El email ya está en uso.")
+        return value
 
 class RoomSerializer(serializers.ModelSerializer):
     class Meta:
