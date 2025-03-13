@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
-import CreateClient from "../components/CreateClient.jsx";
+import CreateClientForAdmin from "../components/CreateClientForAdmin.jsx";
+import { useNavigate } from "react-router-dom";
 
 const UsersTable = () => {
   const [users, setUsers] = useState([]);
@@ -8,6 +9,8 @@ const UsersTable = () => {
   const [showDeletePopup, setShowDeletePopup] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
   const [confirmDelete, setConfirmDelete] = useState(false);
+  
+  const userRole = "superadmin";
 
   useEffect(() => {
     fetchUsers();
@@ -33,16 +36,22 @@ const UsersTable = () => {
   };
 
   const handleDeleteClient = (user) => {
+    console.log("Selected user for deletion:", user); 
     setSelectedUser(user);
     setShowDeletePopup(true);
   };
 
   const confirmDeleteClient = async () => {
-    if (!selectedUser) return;
+    if (!selectedUser){
+      console.log("Usuario no seleccionado");
+      return;
+    }
+
+    console.log("usuario seleccionado: ",selectedUser);
 
     try {
       const response = await fetch(
-        `http://127.0.0.1:8000/api/users/delete/${selectedUser.idUser}/`,
+        `http://127.0.0.1:8000/api/clients/delete_client/${selectedUser.idUserFK}/`,
         { method: "DELETE" }
       );
 
@@ -58,46 +67,87 @@ const UsersTable = () => {
 
   return (
     <div className="table-container">
-    {showCreateForm && (
-      <CreateClient
-        onClose={() => setShowCreateForm(false)}
-        onClientCreated={fetchUsers}
-      />
-    )}
+      {showCreateForm && (
+        <CreateClientForAdmin
+          onClose={() => setShowCreateForm(false)}
+          onClientCreated={fetchUsers}
+        />
+      )}
 
-    <h2>Clientes</h2>
+      <h2>Clientes</h2>
 
-    <div className="container-specific m-5">
-      <button className="buttons-specific" onClick={handleCreateClient}>Crear cliente</button>
-      <button className="buttons-specific">Editar cliente</button>
-      <button className="buttons-specific">Eliminar cliente</button>
-    </div>
+      <div className="container-specific m-5">
+        <button className="buttons-specific" onClick={handleCreateClient}>
+          Crear cliente
+        </button>
+      </div>
 
-    <table className="w-full border-0">
-      <thead className="bg-indigo-700 text-white rounded-t-lg">
-        <tr>
-          <th className="p-2 first:rounded-tl-lg last:rounded-tr-lg border-0">Email</th>
-          <th className="p-2 border-0">Nombre</th>
-          <th className="p-2 border-0">Apellido</th>
-          <th className="p-2 border-0">Teléfono</th>
-          <th className="p-2 border-0">Provincia</th>
-          <th className="p-2 last:rounded-tr-lg border-0">País</th>
-        </tr>
-      </thead>
-      <tbody className="bg-gray-800 text-white">
-        {users.map((user) => (
-          <tr key={user.idUser}>
-            <td className="border-0">{user.email}</td>
-            <td className="border-0">{user.name}</td>
-            <td className="border-0">{user.clients?.[0]?.lastName || "Sin datos"}</td>
-            <td className="border-0">{user.clients?.[0]?.phone || "Sin datos"}</td>
-            <td className="border-0">{user.clients?.[0]?.state || "Sin datos"}</td>
-            <td className="border-0">{user.clients?.[0]?.country || "Sin datos"}</td>
+      {/* Delete confirmation popup */}
+      {showDeletePopup && (
+        <div className="popup-container">
+          <div className="popup-content">
+            <p>¿Estás seguro de que deseas eliminar a este cliente?</p>
+            <button onClick={confirmDeleteClient} className="input-form bg-red-500 hover:bg-red-600">
+              Confirmar
+            </button>
+            <button
+              onClick={() => setShowDeletePopup(false)}
+              className="input-form hover:bg-gray-500"
+            >
+              Cancelar
+            </button>
+          </div>
+        </div>
+      )}
+
+      <table className="w-full border-0">
+        <thead className="bg-indigo-700 text-white rounded-t-lg">
+          <tr>
+            <th className="p-2 first:rounded-tl-lg last:rounded-tr-lg border-0">Email</th>
+            <th className="p-2 border-0">Nombre</th>
+            <th className="p-2 border-0">Apellido</th>
+            <th className="p-2 border-0">Teléfono</th>
+            <th className="p-2 border-0">Provincia</th>
+            <th className="p-2 last:rounded-tr-lg border-0">País</th>
+            <th className="p-2 border-0">Acciones</th>
           </tr>
-        ))}
-      </tbody>
-    </table>
-  </div>
+        </thead>
+        <tbody className="bg-gray-800 text-white">
+          {users.map((user) => (
+            <tr key={user.idUser}>
+              <td className="border-0">{user.email}</td>
+              <td className="border-0">{user.name}</td>
+              <td className="border-0">{user.clients?.[0]?.lastName || "Sin datos"}</td>
+              <td className="border-0">{user.clients?.[0]?.phone || "Sin datos"}</td>
+              <td className="border-0">{user.clients?.[0]?.state || "Sin datos"}</td>
+              <td className="border-0">{user.clients?.[0]?.country || "Sin datos"}</td>
+              <td className="border-0 flex justify-center">
+                {userRole === "superadmin" && (
+                  <>
+                  <button
+                    onClick={() => console.log(`Editar habitación ${room.number}`)}
+                    className="p-2 bg-blue-700 text-white rounded-full mr-2 hover:bg-blue-600"
+                  >
+                    <img src="src/assets/img/acciones/lapiz.png" alt="Editar" className="w-6 h-6" />
+                  </button>
+                
+                  <button
+                    onClick={() => {
+                      handleDeleteClient(user);
+                    }}
+                    className="p-2 bg-red-700 text-white rounded-full hover:bg-red-600"
+                  >
+                    <img src="src/assets/img/acciones/borrar.png" alt="Eliminar" className="w-6 h-6" />
+                  </button>
+                  </>
+                )}
+                
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
   );
 };
 

@@ -1,16 +1,13 @@
 import React, { useEffect, useState } from "react";
 import CreateRoom from "../components/CreateRoom.jsx";
 
-
 const RoomsTable = () => {
   const [rooms, setRooms] = useState([]);
   const [selectedRoom, setSelectedRoom] = useState(null);
   const [showCreateForm, setShowCreateForm] = useState(false);
-
   const [showDeletePopup, setShowDeletePopup] = useState(false);
   const [roomNumberToDelete, setRoomNumberToDelete] = useState("");
   const [confirmDelete, setConfirmDelete] = useState(false);
-
   const [isEditing, setIsEditing] = useState(false);
   const [editedRooms, setEditedRooms] = useState({});
 
@@ -20,7 +17,6 @@ const RoomsTable = () => {
     fetchRooms();
   }, []);
 
-  // Mostrar habitaciones
   const fetchRooms = async () => {
     try {
       const response = await fetch("http://127.0.0.1:8000/api/rooms/");
@@ -31,7 +27,6 @@ const RoomsTable = () => {
     }
   };
 
-  // Eliminar habitación
   const handleDeleteRoom = async () => {
     try {
       const response = await fetch(
@@ -44,7 +39,7 @@ const RoomsTable = () => {
         }
       );
 
-      if (!response.ok){
+      if (!response.ok) {
         throw new Error("No se pudo eliminar la habitación");
       }
 
@@ -53,17 +48,15 @@ const RoomsTable = () => {
       setConfirmDelete(false);
       setShowDeletePopup(false);
       fetchRooms();
-    }catch(error){
+    } catch (error) {
       console.error("Error deleting room:", error);
     }
-  }
+  };
 
-  // Abrir popup de eliminación
   const handleOpenDeletePopup = () => {
     setShowDeletePopup(true);
   };
 
-  // Cancelar eliminación
   const handleCancelDelete = () => {
     setShowDeletePopup(false);
     setRoomNumberToDelete("");
@@ -80,7 +73,6 @@ const RoomsTable = () => {
   };
 
   const handleStateChange = (idRoom, newState) => {
-    // Actualizamos el estado editado para la habitación específica
     setEditedRooms((prev) => ({
       ...prev,
       [idRoom]: newState,
@@ -89,7 +81,6 @@ const RoomsTable = () => {
 
   const handleSaveStates = async () => {
     try {
-      // Realizamos la actualización en el backend para cada habitación modificada
       for (const [idRoom, newState] of Object.entries(editedRooms)) {
         const response = await fetch(
           `http://127.0.0.1:8000/api/rooms/${idRoom}/update_state/`,
@@ -106,7 +97,6 @@ const RoomsTable = () => {
         }
       }
 
-      // Recargamos las habitaciones para reflejar los cambios
       fetchRooms();
       setIsEditing(false);
     } catch (error) {
@@ -115,7 +105,6 @@ const RoomsTable = () => {
   };
 
   const handleCancelEdit = () => {
-    // Salir del modo edición sin guardar
     setIsEditing(false);
     setEditedRooms({});
   };
@@ -163,56 +152,43 @@ const RoomsTable = () => {
             </div>
           </div>
         </div>
-      )}  
+      )}
 
       <h2>Habitaciones</h2>
       <div className="container-specific m-5">
         {userRole === "superadmin" && (
           <>
-            <button className="buttons-specific" onClick={() => setShowFilter(true)}>Filtrar</button>
-            <button className="buttons-specific" onClick={() => setShowCreateForm(true)}>Crear nueva habitación</button>
-            <button className="buttons-specific" onClick={() => setShowEditForm(true)}>Editar habitación</button>
-            <button className="buttons-specific" onClick={handleOpenDeletePopup}>Eliminar habitación</button>
-          </>
-          
-        )}
-        <div className="container-specific">
-          {!isEditing ? (
-            <button className="buttons-specific" onClick={handleEditState}>
-              Editar estado
+            <button className="buttons-specific" onClick={() => setShowCreateForm(true)}>
+              Crear nueva habitación
             </button>
-          ) : (
-            <>
-              <button className="buttons-specific bg-blue-300 border-blue-300" onClick={handleSaveStates}>
-                Guardar cambios
-              </button>
-              <button className="buttons-specific bg-red-300 border-red-300" onClick={handleCancelEdit}>
-                Cancelar
-              </button>
-            </>
-          )}
+          </>
+        )}
       </div>
-      </div>
-      <div>
-        {/*Filtrar por: Número (ascendente / descendente), tipo, y estado. (mirar como hacerlo) */}
-      </div>
-      
+
       <table className="w-full border-0">
         <thead className="bg-indigo-700 text-white rounded-t-lg">
-        <tr>
-          <th className="p-2 first:rounded-tl-lg last:rounded-tr-lg border-0">Número</th>
-          <th className="p-2 border-0">Tipo</th>
-          <th className="p-2 border-0">Precio</th>
-          <th className="p-2 last:rounded-tr-lg border-0">Estado</th>
-        </tr>
+          <tr>
+            <th className="p-2 border-0">Número</th>
+            <th className="p-2 border-0">Tipo</th>
+            <th className="p-2 border-0">Precio</th>
+            <th className="p-2 border-0">Huésped</th>
+            <th className="p-2 border-0">Detalles</th>
+            <th className="p-2 border-0">Estado</th>
+            <th className="p-2 border-0">Acciones</th>
+          </tr>
         </thead>
         <tbody className="bg-gray-800 text-white">
-
           {rooms.map((room) => (
             <tr key={room.idRoom}>
               <td className="border-0">{room.number}</td>
               <td className="border-0">{room.typeRoom}</td>
               <td className="border-0">{room.price}</td>
+              <td className="border-0">
+                {room.guestName || "No asignado"}
+              </td>
+              <td className="border-0">
+                {room.guestName || "Solo cama"}
+              </td>
               <td className="border-0">
                 {isEditing ? (
                   <select
@@ -223,7 +199,7 @@ const RoomsTable = () => {
                     <option value="ocupada">Ocupada</option>
                     <option value="mantenimiento">En mantenimiento</option>
                   </select>
-                ):(
+                ) : (
                   <div>
                     <span
                       className="status-circle"
@@ -235,10 +211,33 @@ const RoomsTable = () => {
                             ? "green"
                             : "black",
                       }}
-                    ></span> 
+                    ></span>
                     {room.state}
                   </div>
                 )}
+              </td>
+              <td className="border-0 flex justify-center">
+                {userRole === "superadmin" && (
+                  <>
+                  <button
+                    onClick={() => console.log(`Editar habitación ${room.number}`)}
+                    className="p-2 bg-blue-700 text-white rounded-full mr-2 hover:bg-blue-600"
+                  >
+                    <img src="src/assets/img/acciones/lapiz.png" alt="Editar" className="w-6 h-6" />
+                  </button>
+                
+                  <button
+                    onClick={() => {
+                      setRoomNumberToDelete(room.number);
+                      handleOpenDeletePopup();
+                    }}
+                    className="p-2 bg-red-700 text-white rounded-full hover:bg-red-600"
+                  >
+                    <img src="src/assets/img/acciones/borrar.png" alt="Eliminar" className="w-6 h-6" />
+                  </button>
+                  </>
+                )}
+                
               </td>
             </tr>
           ))}

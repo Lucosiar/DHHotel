@@ -1,11 +1,11 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 
 const CreateRoom = ({ onClose, onRoomCreated }) => {
   const [formData, setFormData] = useState({
     number: "",
     typeRoom: "simple",
     price: "",
-    state: "en mantenimiento",
+    state: "mantenimiento",
   });
 
   const [errorMessage, setErrorMessage] = useState("");
@@ -17,75 +17,52 @@ const CreateRoom = ({ onClose, onRoomCreated }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
     if (!formData.number || !formData.typeRoom || !formData.price) {
       setErrorMessage("Por favor, completa todos los campos requeridos.");
       return;
     }
 
-    console.log("Datos enviados al servidor:", formData);
-
     try {
       const response = await fetch("http://localhost:8000/api/rooms/create_room/", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),
       });
 
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(
-          errorData.number ? errorData.number[0] : "Error al crear la habitación"
-        );
+        throw new Error(errorData.number ? errorData.number[0] : "Error al crear la habitación");
       }
 
-      const data = await response.json();
-      console.log("Habitación creada:", data);
-
       onRoomCreated();
-
       onClose();
     } catch (error) {
-      console.error("Error al crear la habitación:", error);
       setErrorMessage(error.message);
     }
   };
 
-  const handleClose = () => {
-    setFormData({
-      number: "",
-      typeRoom: "simple",
-      price: "",
-      state: "mantenimiento",
-    });
-    setErrorMessage("");
-    onClose();
-  };
-
   return (
-    <div className="form-container">
-      <h2 className="mt-10">Crear Nueva Habitación</h2>
-      <form onSubmit={handleSubmit} className="form-group">
-        <div className="">
-          <label>Número:</label>
+    <div className="w-full max-w-lg mx-auto bg-gray-900 rounded-lg shadow-md p-6">
+      <h1 className="text-xl font-bold text-white">Crear Nueva Habitación</h1>
+      <form className="space-y-4" onSubmit={handleSubmit}>
+        <div>
+          <label className="block text-sm font-medium text-white">Número</label>
           <input
             type="text"
             name="number"
-            className="input-form"
             value={formData.number}
             onChange={handleChange}
+            className="bg-gray-700 border border-gray-600 text-white rounded-lg w-full p-2.5"
             required
           />
         </div>
         <div>
-          <label>Tipo:</label>
+          <label className="block text-sm font-medium text-white">Tipo</label>
           <select
             name="typeRoom"
             value={formData.typeRoom}
             onChange={handleChange}
-            className="input-form"
+            className="bg-gray-700 border border-gray-600 text-white rounded-lg w-full p-2.5"
             required
           >
             <option value="simple">Simple</option>
@@ -94,23 +71,23 @@ const CreateRoom = ({ onClose, onRoomCreated }) => {
           </select>
         </div>
         <div>
-          <label>Precio:</label>
+          <label className="block text-sm font-medium text-white">Precio</label>
           <input
             type="number"
             name="price"
-            className="input-form"
             value={formData.price}
             onChange={handleChange}
+            className="bg-gray-700 border border-gray-600 text-white rounded-lg w-full p-2.5"
             required
           />
         </div>
         <div>
-          <label>Estado:</label>
+          <label className="block text-sm font-medium text-white">Estado</label>
           <select
             name="state"
             value={formData.state}
             onChange={handleChange}
-            className="input-form"
+            className="bg-gray-700 border border-gray-600 text-white rounded-lg w-full p-2.5"
             required
           >
             <option value="disponible">Disponible</option>
@@ -118,24 +95,34 @@ const CreateRoom = ({ onClose, onRoomCreated }) => {
             <option value="mantenimiento">En Mantenimiento</option>
           </select>
         </div>
-            <button type="submit" className="buttons-create-room">Guardar</button>
-            <button type="button" onClick={handleClose} className="buttons-create-room">
+        <div className="flex justify-between">
+          <button
+            type="button"
+            onClick={onClose}
+            className="w-1/2 p-2 rounded bg-red-600 text-white hover:bg-red-800 mr-2"
+          >
             Cerrar
-            </button>
+          </button>
+          <button
+            type="submit"
+            className="w-1/2 p-2 rounded bg-indigo-700 text-white hover:bg-green-700 ml-2"
+          >
+            Guardar
+          </button>
+        </div>
       </form>
 
       {errorMessage && (
-        <div className="modal-overlay">
-          <div className="modal">
-            <h3>Error</h3>
-            <p>{errorMessage}</p>
-            <button onClick={() => setErrorMessage("")} className="modal-button">
-              Cerrar
-            </button>
-          </div>
+        <div className="mt-4 p-4 bg-red-600 text-white rounded-lg">
+          <p>{errorMessage}</p>
+          <button
+            onClick={() => setErrorMessage("")}
+            className="mt-2 bg-gray-800 text-white p-2 rounded-lg"
+          >
+            Cerrar
+          </button>
         </div>
       )}
-      
     </div>
   );
 };

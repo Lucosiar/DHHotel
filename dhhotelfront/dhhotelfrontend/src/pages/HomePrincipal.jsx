@@ -3,17 +3,58 @@ import { useNavigate } from "react-router-dom";
 import "../assets/css/HomePrincipal.css";
 
 const HomePrincipal = () => {
+
+  const [phonePrefixes, setPhonePrefixes] = useState([]);
+
   const [isScrolled, setIsScrolled] = useState(false);
   const navigate = useNavigate();
+
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    phonePrefix: "+34",
+    phone: "",
+    message: "",
+  });
+
+  const parseCSV = (csvData) => {
+    const rows = csvData.split("\n").slice(1);
+    return rows.map(row => {
+      const [code, country] = row.split(",");
+      return { code, country };
+    });
+  };
+
+  const fetchData = async () => {
+    try {
+      const response = await fetch("/prefixesPhone.csv");
+      const csvText = await response.text();
+      const parsedData = parseCSV(csvText);
+      setPhonePrefixes(parsedData);
+    } catch (error) {
+      console.error("Error cargando prefijos:", error);
+    }
+  };
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prevData) => ({
+    ...prevData,
+    [name]: value,
+    }));
+  };
 
   const handleLogin = () => {
     navigate("/login");
   };
 
   useEffect(() => {
+
+    //CargarCSV
+    fetchData();
+
     // Poner fecha actual
     const today = new Date();
-
     const formattedDate = today
       .toLocaleDateString('es-ES')
       .split('/').reverse().join('-');
@@ -36,6 +77,7 @@ const HomePrincipal = () => {
       window.removeEventListener("scroll", handleScroll);
     };
   }, []);
+  
 
   return (
   <div className="relative min-h-screen">
@@ -146,7 +188,7 @@ const HomePrincipal = () => {
           
           <div className="room-container relative">
             <div className="button-overlay">
-              <button className="reserve-button">Reservar</button>
+              <button onClick={handleLogin} className="reserve-button">Reservar</button>
             </div>
             <img src="/src/assets/img/habitacion_simple_2camas.jpg" alt="room" className="size-image_room"/>
             <h3 className="text-center mt-2">Habitación simple</h3>
@@ -156,7 +198,7 @@ const HomePrincipal = () => {
           <div className="room-container relative">
             <img src="/src/assets/img/habitacion_doble.jpg" alt="room" className="size-image_room"/>
             <div className="button-overlay">
-              <button className="reserve-button">Reservar</button>
+              <button onClick={handleLogin}  className="reserve-button">Reservar</button>
             </div>
             <h3>Habitación doble</h3>
             <h4>Desde 22€\noche</h4>
@@ -165,7 +207,7 @@ const HomePrincipal = () => {
           <div className="room-container relative">
             <img src="/src/assets/img/habitacion_suite.jpg" alt="room" className="size-image_room"/>
             <div className="button-overlay">
-              <button className="reserve-button">Reservar</button>
+              <button onClick={handleLogin}  className="reserve-button">Reservar</button>
             </div>
             <h3>Habitación suite</h3>
             <h4>Desde 33€\noche</h4>
@@ -180,11 +222,13 @@ const HomePrincipal = () => {
             <div className="flex gap-4 items-center mt-5">
               <input 
                 className="flex-1 p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-700" 
-                type="text" 
+                type="text"
+                id="name"
                 placeholder="Nombre" 
               />
               <select 
                 className="p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-700"
+                id="room_type"
               >
                 <option value="">Tipo de habitación</option>
                 <option value="individual">Individual</option>
@@ -195,14 +239,36 @@ const HomePrincipal = () => {
             <div>
               <input 
                 className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-700" 
-                type="text" 
+                type="text"
+                id="email"
                 placeholder="Email" 
               />
             </div>
+            <div className="flex gap-2 items-center">
+              <select
+                name="phonePrefix"
+                className="text-white p-3 w-1/3 rounded-lg"
+                value={formData.phonePrefix}
+                onChange={handleInputChange}
+              >
+                {phonePrefixes.map((prefix, index) => (
+                  <option key={`${prefix.code}-${index}`} value={prefix.code}>
+                    {prefix.code} - {prefix.country}
+                  </option>
+                ))}
+              </select>
+              <input 
+                className="flex-1 p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-700" 
+                type="text"
+                id="phone"
+                placeholder="Teléfono"
+              />
+            </div>      
             <div>
               <textarea 
                 className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-700" 
                 placeholder="Mensaje"
+                id="message"
               ></textarea>
             </div>
             <div className="text-center">
