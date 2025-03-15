@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from "react-router-dom";
 import "../../assets/css/Homes.css";
-import BookingsTable from "../components/BookingsTable.jsx";
-import UsersTable from "../components/UserTable.jsx";
-import RoomsTable from "../components/RoomsTable.jsx";
-import PaymentsTable from "../components/PaymentsTable.jsx";
+import BookingsTable from "../components/Bookings/BookingsTable.jsx";
+import ClientsTable from "../components/Clients/ClientsTable.jsx";
+import RoomsTable from "../components/Rooms/RoomsTable.jsx";
+import PaymentsTable from "../components/Payments/PaymentsTable.jsx";
 
 
 
@@ -71,7 +71,7 @@ const HomeAdmin = () => {
 
     <div className="flex-1 p-6 bg-gray-600 overflow-auto">
       {selectedOption === "bookings" && <BookingsTable />}
-      {selectedOption === "users" && <UsersTable />}
+      {selectedOption === "users" && <ClientsTable />}
       {selectedOption === "rooms" && <RoomsTable />}
       {selectedOption === "payments" && <PaymentsTable />}
     </div>

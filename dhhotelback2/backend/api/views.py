@@ -115,6 +115,7 @@ class ClientViewSet(viewsets.ModelViewSet):
     def delete_client(self, request, pk=None):
         client = self.get_object()
         user = client.idUserFK
+        print("usuario", user)
         client.delete()
         user.delete()
         return Response(status=204)

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import CreateRoom from "../components/CreateRoom.jsx";
+import CreateRoom from "../Rooms/CreateRoom.jsx";
 
 const RoomsTable = () => {
   const [rooms, setRooms] = useState([]);
@@ -122,11 +122,12 @@ const RoomsTable = () => {
         <div className="popup-container">
           <div className="popup-content">
             <h3>Eliminar Habitación</h3>
-            <p>Por favor, ingresa el número de la habitación que deseas eliminar:</p>
+            <p>¿Esta es la habitación que deseas eliminar?</p> 
             <input
               type="text"
               className="input-form"
               value={roomNumberToDelete}
+              readOnly
               onChange={(e) => setRoomNumberToDelete(e.target.value)}
               placeholder="Número de habitación"
             />
@@ -172,7 +173,6 @@ const RoomsTable = () => {
             <th className="p-2 border-0">Tipo</th>
             <th className="p-2 border-0">Precio</th>
             <th className="p-2 border-0">Huésped</th>
-            <th className="p-2 border-0">Detalles</th>
             <th className="p-2 border-0">Estado</th>
             <th className="p-2 border-0">Acciones</th>
           </tr>
@@ -185,9 +185,6 @@ const RoomsTable = () => {
               <td className="border-0">{room.price}</td>
               <td className="border-0">
                 {room.guestName || "No asignado"}
-              </td>
-              <td className="border-0">
-                {room.guestName || "Solo cama"}
               </td>
               <td className="border-0">
                 {isEditing ? (

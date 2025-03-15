@@ -1,0 +1,204 @@
+import React, { useState, useEffect } from "react";
+
+const CreateBooking = ({ onClose, onBookingCreated }) => {
+  const [clients, setClients] = useState([]);
+  const [rooms, setRooms] = useState([]);
+  const [bookingData, setBookingData] = useState({
+    idBooking: "",
+    startDate: "",
+    endDate: "",
+    state: "pendiente",
+    clientId: "",
+    roomId: "",
+    paymentDone: false,
+  });
+
+  const [errorMessage, setErrorMessage] = useState("");
+
+  useEffect(() => {
+    fetchClients();
+    fetchRooms();
+  }, []);
+
+  const fetchClients = async () => {
+    try {
+      const response = await fetch("http://127.0.0.1:8000/api/clients/");
+      const data = await response.json();
+      setClients(data);
+    } catch (error) {
+      console.error("Error fetching clients:", error);
+    }
+  };
+
+  const fetchRooms = async () => {
+    try {
+      const response = await fetch("http://127.0.0.1:8000/api/rooms/");
+      const data = await response.json();
+      setRooms(data);
+    } catch (error) {
+      console.error("Error fetching rooms:", error);
+    }
+  };
+
+  const handleInputChange = (e) => {
+    setBookingData({
+      ...bookingData,
+      [e.target.name]: e.target.value,
+    });
+  };
+
+  const handleCheckboxChange = (e) => {
+    setBookingData({
+      ...bookingData,
+      paymentDone: e.target.checked,
+    });
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (bookingData.state === "confirmada" && !bookingData.paymentDone) {
+      setErrorMessage("El pago debe estar realizado para confirmar la reserva.");
+      return;
+    }
+
+    try {
+      const response = await fetch("http://127.0.0.1:8000/api/bookings/create_booking/", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(bookingData),
+      });
+
+      if (response.ok) {
+        onBookingCreated();
+        onClose();
+      } else {
+        const data = await response.json();
+        setErrorMessage(data.error || "Error al crear la reserva.");
+      }
+    } catch (error) {
+      setErrorMessage("Error creando la reserva.");
+    }
+  };
+
+  const today = new Date().toISOString().split("T")[0];
+
+  return (
+    <div className="w-full max-w-lg mx-auto bg-gray-900 rounded-lg shadow-md p-6">
+      <h1 className="text-xl font-bold text-white">Crear Nueva Reserva</h1>
+      <form className="space-y-4" onSubmit={handleSubmit}>
+        <div>
+          <label className="block text-sm font-medium text-white">Fecha de Llegada</label>
+          <input
+            type="date"
+            name="startDate"
+            value={bookingData.startDate}
+            onChange={handleInputChange}
+            className="bg-gray-700 border border-gray-600 text-white rounded-lg w-full p-2.5"
+            required
+            min={today}
+          />
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-white">Fecha de Salida</label>
+          <input
+            type="date"
+            name="endDate"
+            value={bookingData.endDate}
+            onChange={handleInputChange}
+            className="bg-gray-700 border border-gray-600 text-white rounded-lg w-full p-2.5"
+            required
+            min={bookingData.startDate}
+          />
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-white">Estado</label>
+          <select
+            name="state"
+            value={bookingData.state}
+            onChange={handleInputChange}
+            className="bg-gray-700 border border-gray-600 text-white rounded-lg w-full p-2.5"
+            required
+          >
+            <option value="pendiente">Pendiente</option>
+            <option value="confirmada">Confirmada</option>
+            <option value="cancelada">Cancelada</option>
+          </select>
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-white">Cliente</label>
+          <select
+            name="clientId"
+            value={bookingData.clientId}
+            onChange={handleInputChange}
+            className="bg-gray-700 border border-gray-600 text-white rounded-lg w-full p-2.5"
+            required
+          >
+            {clients.map((client) => (
+              <option key={client.idClient} value={client.idClient}>
+                {client.firstName} {client.lastName}
+              </option>
+            ))}
+          </select>
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-white">Habitación</label>
+          <select
+            name="roomId"
+            value={bookingData.roomId}
+            onChange={handleInputChange}
+            className="bg-gray-700 border border-gray-600 text-white rounded-lg w-full p-2.5"
+            required
+          >
+            {rooms.map((room) => (
+              <option key={room.idRoom} value={room.idRoom}>
+                Habitación {room.number}
+              </option>
+            ))}
+          </select>
+        </div>
+        <div>
+          Estado de la habitación para esa fecha:
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-white">Pago Realizado</label>
+          <input
+            type="checkbox"
+            checked={bookingData.paymentDone}
+            onChange={handleCheckboxChange}
+            className="bg-gray-700 border border-gray-600 text-white rounded-lg w-full p-2.5"
+          />
+        </div>
+
+        <div className="flex justify-between">
+          <button
+            type="button"
+            onClick={onClose}
+            className="w-1/2 p-2 rounded bg-red-600 text-white hover:bg-red-800 mr-2"
+          >
+            Cerrar
+          </button>
+          <button
+            type="submit"
+            className="w-1/2 p-2 rounded bg-indigo-700 text-white hover:bg-green-700 ml-2"
+          >
+            Crear Reserva
+          </button>
+        </div>
+      </form>
+
+      {errorMessage && (
+        <div className="mt-4 p-4 bg-red-600 text-white rounded-lg">
+          <p>{errorMessage}</p>
+          <button
+            onClick={() => setErrorMessage("")}
+            className="mt-2 bg-gray-800 text-white p-2 rounded-lg"
+          >
+            Cerrar
+          </button>
+        </div>
+      )}
+    </div>
+  );
+};
+
+export default CreateBooking;

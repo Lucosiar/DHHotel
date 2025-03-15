@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
-import CreateClientForAdmin from "../components/CreateClientForAdmin.jsx";
+import CreateClientForAdmin from "./CreateClientForAdmin.jsx";
 import { useNavigate } from "react-router-dom";
 
-const UsersTable = () => {
+const ClientsTable = () => {
   const [users, setUsers] = useState([]);
   const [showCreateForm, setShowCreateForm] = useState(false);
   const [showEditForm, setShowEditForm] = useState(false);
@@ -35,33 +35,38 @@ const UsersTable = () => {
     setShowEditForm(true);
   };
 
-  const handleDeleteClient = (user) => {
-    console.log("Selected user for deletion:", user); 
-    setSelectedUser(user);
+  const handleDeleteClient = (client) => {
+    setSelectedUser(client);
     setShowDeletePopup(true);
   };
 
   const confirmDeleteClient = async () => {
-    if (!selectedUser){
-      console.log("Usuario no seleccionado");
+    if (!selectedUser) {
+      console.log("Cliente no seleccionado");
       return;
     }
-
-    console.log("usuario seleccionado: ",selectedUser);
-
+  
+    const userId = selectedUser.idUserFK;
+    const clientId = selectedUser.idCliente;
+  
+    if (!userId || !clientId) {
+      console.log("No se encontró el ID del cliente o el ID del usuario");
+      return;
+    }
+  
     try {
-      const response = await fetch(
-        `http://127.0.0.1:8000/api/clients/delete_client/${selectedUser.idUserFK}/`,
+      const clientResponse = await fetch(
+        `http://127.0.0.1:8000/api/clients/${clientId}/delete_client/`,
         { method: "DELETE" }
       );
-
-      if (!response.ok) throw new Error("No se pudo eliminar el cliente");
-
-      alert(`El cliente ${selectedUser.name} ha sido eliminado.`);
+  
+      if (!clientResponse.ok) throw new Error("No se pudo eliminar el cliente");
+  
+      alert(`El cliente ${selectedUser.lastName} y el usuario han sido eliminados.`);
       setShowDeletePopup(false);
       fetchUsers();
     } catch (error) {
-      console.error("Error al eliminar cliente:", error);
+      console.error("Error al eliminar cliente o usuario:", error);
     }
   };
 
@@ -125,23 +130,20 @@ const UsersTable = () => {
                 {userRole === "superadmin" && (
                   <>
                   <button
-                    onClick={() => console.log(`Editar habitación ${room.number}`)}
+                    onClick={() => console.log(`Editar usuario ${room.number}`)}
                     className="p-2 bg-blue-700 text-white rounded-full mr-2 hover:bg-blue-600"
                   >
                     <img src="src/assets/img/acciones/lapiz.png" alt="Editar" className="w-6 h-6" />
                   </button>
                 
                   <button
-                    onClick={() => {
-                      handleDeleteClient(user);
-                    }}
+                    onClick={() => handleDeleteClient(user.clients?.[0])}  // Pasamos el cliente específico
                     className="p-2 bg-red-700 text-white rounded-full hover:bg-red-600"
                   >
                     <img src="src/assets/img/acciones/borrar.png" alt="Eliminar" className="w-6 h-6" />
                   </button>
                   </>
                 )}
-                
               </td>
             </tr>
           ))}
@@ -151,4 +153,4 @@ const UsersTable = () => {
   );
 };
 
-export default UsersTable;
+export default ClientsTable;

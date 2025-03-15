@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
-const CreateClient = ({ onClose, onClientCreated }) => {
+const CreateClient = ({ onClose , onClientCreated}) => {
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -13,36 +13,35 @@ const CreateClient = ({ onClose, onClientCreated }) => {
     country: "",
   });
 
-  const navigate = useNavigate();
   const [phonePrefixes, setPhonePrefixes] = useState([]);
 
-  const fetchData = async () => {
-    try {
-      const response = await fetch("/prefixesPhone.csv");
-      const csvText = await response.text();
-      const parsedData = csvText
-        .split("\n")
-        .slice(1)
-        .map((row) => {
-          const [code, country] = row.split(",");
-          return { code, country };
-        });
-      setPhonePrefixes(parsedData);
-    } catch (error) {
-      console.error("Error cargando prefijos:", error);
-    }
-  };
-
   useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await fetch("/prefixesPhone.csv");
+        const csvText = await response.text();
+        const parsedData = csvText
+          .split("\n")
+          .slice(1)
+          .map((row) => {
+            const [code, country] = row.split(",");
+            return { code, country };
+          });
+        setPhonePrefixes(parsedData);
+      } catch (error) {
+        console.error("Error cargando prefijos:", error);
+      }
+    };
     fetchData();
   }, []);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setFormData((prevData) => ({
-      ...prevData,
-      [name]: value,
-    }));
+    setFormData((prevData) => ({ ...prevData, [name]: value }));
+  };
+
+  const generateRandomPassword = () => {
+    return Math.random().toString(36).slice(-8);
   };
 
   const handleProfileUpdate = async (e) => {
@@ -53,39 +52,72 @@ const CreateClient = ({ onClose, onClientCreated }) => {
     }
 
     const fullPhone = `${formData.phonePrefix}${formData.phone}`;
-    const newClientData = { ...formData, phone: fullPhone, idUser: userId };
+    const password = generateRandomPassword();
 
     try {
-      const response = await fetch("http://127.0.0.1:8000/api/clients/create_client/", {
+      const userResponse = await fetch("http://127.0.0.1:8000/api/users/create_user/", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(newClientData),
+        body: JSON.stringify({
+          name: formData.name,
+          email: formData.email,
+          password,
+          rol: "client",
+          last_login: new Date().toISOString(),
+        }),
       });
 
-      if (response.ok) {
-        navigate("/client");
-      } else {
-        console.error("Error al crear el cliente:", await response.json());
-        alert("Hubo un error al crear el cliente");
+      if (!userResponse.ok) {
+        const errorData = await userResponse.json();
+        alert(`Error al crear usuario: ${errorData.error || "Inténtalo de nuevo"}`);
+        return;
       }
+
+      const userData = await userResponse.json();
+      const userId = userData.idUser;
+
+      const clientResponse = await fetch("http://127.0.0.1:8000/api/clients/create_client/", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          idUser: userId,
+          lastName: formData.lastName,
+          phone: fullPhone,
+          city: formData.city,
+          state: formData.state,
+          country: formData.country,
+        }),
+      });
+
+      if (!clientResponse.ok) {
+        const errorData = await clientResponse.json();
+        alert(`Error al crear cliente: ${errorData.error || "Inténtalo de nuevo"}`);
+        return;
+      } else {
+        const clientData = await clientResponse.json();
+        alert(`El usuario ${userId} ha sido creado con éxito.`);
+      }
+
+      onClose();
+      onClientCreated();
+      
     } catch (error) {
-      console.error("Error al crear el perfil:", error);
-      alert("Hubo un problema al crear el perfil. Inténtalo de nuevo.");
+      console.error("Error al crear el cliente:", error);
+      alert("Hubo un problema al crear el cliente. Inténtalo de nuevo.");
     }
   };
 
   const handleClose = () => {
     setFormData({
-        name: "",
-        email: "",
-        lastName: "",
-        phonePrefix: "+34",
-        phone: "",
-        city: "",
-        state: "",
-        country: "",
+      name: "",
+      email: "",
+      lastName: "",
+      phonePrefix: "+34",
+      phone: "",
+      city: "",
+      state: "",
+      country: "",
     });
-    //setErrorMessage("");
     onClose();
   };
 

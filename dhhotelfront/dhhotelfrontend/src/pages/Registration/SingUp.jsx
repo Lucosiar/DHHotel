@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import CreateClient from '../components/CreateClient';
+import CreateClient from '../components/Clients/CreateClient';
 
 const SingUp = () => {
   const [isUserCreated, setIsUserCreated] = useState(false);
