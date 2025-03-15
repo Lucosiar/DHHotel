@@ -4,18 +4,25 @@ const CreateBooking = ({ onClose, onBookingCreated }) => {
   const [clients, setClients] = useState([]);
   const [rooms, setRooms] = useState([]);
   const [bookingData, setBookingData] = useState({
-    idBooking: "",
     startDate: "",
     endDate: "",
     state: "pendiente",
     clientId: "",
     roomId: "",
     paymentDone: false,
+    amount: "",
+    paymentDate: "",
+    paymentMethod: "",
+    paymentId: "",
   });
+
+  const [bookings, setBookings] = useState([]);
+  const [filteredRooms, setFilteredRooms] = useState([]);
 
   const [errorMessage, setErrorMessage] = useState("");
 
   useEffect(() => {
+    fetchBookings();
     fetchClients();
     fetchRooms();
   }, []);
@@ -40,47 +47,89 @@ const CreateBooking = ({ onClose, onBookingCreated }) => {
     }
   };
 
-  const handleInputChange = (e) => {
-    setBookingData({
-      ...bookingData,
-      [e.target.name]: e.target.value,
-    });
+  const fetchBookings = async () => {
+    try {
+      const response = await fetch("http://127.0.0.1:8000/api/bookings/");
+      const data = await response.json();
+      setBookings(data);
+    } catch (error) {
+      console.error("Error fetching bookings:", error);
+    }
   };
 
-  const handleCheckboxChange = (e) => {
-    setBookingData({
-      ...bookingData,
-      paymentDone: e.target.checked,
+  const handleInputChange = (e) => {
+    const { name, value, type, checked } = e.target;
+  
+    setBookingData((prevData) => {
+      const updatedData = {
+        ...prevData,
+        [name]: type === "checkbox" ? checked : value,
+      };
+  
+      if (name === "startDate" || name === "endDate") {
+        filterAvailableRooms(updatedData.startDate, updatedData.endDate);
+      }
+  
+      return updatedData;
     });
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+  
     if (bookingData.state === "confirmada" && !bookingData.paymentDone) {
-      setErrorMessage("El pago debe estar realizado para confirmar la reserva.");
+      alert("El pago debe estar realizado para confirmar la reserva.");
       return;
     }
-
+  
+    console.log("Enviando datos al backend:", JSON.stringify(bookingData, null, 2));
+  
     try {
       const response = await fetch("http://127.0.0.1:8000/api/bookings/create_booking/", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+        },
         body: JSON.stringify(bookingData),
       });
-
+  
+      const data = await response.json();
+  
       if (response.ok) {
-        onBookingCreated();
-        onClose();
+        alert("Reserva creada con éxito");
       } else {
-        const data = await response.json();
-        setErrorMessage(data.error || "Error al crear la reserva.");
+        console.error("Error al crear la reserva:", data);
+        alert("Error al crear la reserva: " + JSON.stringify(data, null, 2));
       }
     } catch (error) {
-      setErrorMessage("Error creando la reserva.");
+      console.error("Error en la solicitud:", error);
     }
   };
+  
 
   const today = new Date().toISOString().split("T")[0];
+
+  const filterAvailableRooms = (startDate, endDate) => {
+    if (!startDate || !endDate) return;
+
+    const unavailableRooms = new Set();
+
+    bookings.forEach((booking) => {
+      if (
+        (startDate >= booking.startDate && startDate < booking.endDate) || 
+        (endDate > booking.startDate && endDate <= booking.endDate) || 
+        (startDate <= booking.startDate && endDate >= booking.endDate)
+      ) {
+        unavailableRooms.add(booking.roomId);
+      }
+    });
+
+    const availableRooms = rooms.filter(
+      (room) => !unavailableRooms.has(room.idRoom) && room.state !== "mantenimiento"
+    );
+
+    setFilteredRooms(availableRooms);
+  };
 
   return (
     <div className="w-full max-w-lg mx-auto bg-gray-900 rounded-lg shadow-md p-6">
@@ -141,7 +190,7 @@ const CreateBooking = ({ onClose, onBookingCreated }) => {
           </select>
         </div>
         <div>
-          <label className="block text-sm font-medium text-white">Habitación</label>
+          <label className="block text-sm font-medium text-white">Habitaciones disponibles</label>
           <select
             name="roomId"
             value={bookingData.roomId}
@@ -149,25 +198,81 @@ const CreateBooking = ({ onClose, onBookingCreated }) => {
             className="bg-gray-700 border border-gray-600 text-white rounded-lg w-full p-2.5"
             required
           >
-            {rooms.map((room) => (
-              <option key={room.idRoom} value={room.idRoom}>
-                Habitación {room.number}
-              </option>
-            ))}
+            {filteredRooms.length > 0 ? (
+              filteredRooms.map((room) => (
+                <option key={room.idRoom} value={room.idRoom}>
+                  Habitación {room.number}
+                </option>
+              ))
+            ) : (
+              <option value="">No hay habitaciones disponibles</option>
+            )}
           </select>
         </div>
         <div>
-          Estado de la habitación para esa fecha:
-        </div>
-        <div>
-          <label className="block text-sm font-medium text-white">Pago Realizado</label>
+          <label className="block text-sm font-medium text-white">
+            Pago realizado
+          </label>
           <input
             type="checkbox"
+            name="paymentDone"
             checked={bookingData.paymentDone}
-            onChange={handleCheckboxChange}
-            className="bg-gray-700 border border-gray-600 text-white rounded-lg w-full p-2.5"
+            onChange={handleInputChange}
+            className="mr-2"
           />
         </div>
+
+        {/* Campos adicionales si el pago está realizado */}
+        {bookingData.paymentDone && (
+          <>
+            <div>
+              <label className="block text-sm font-medium text-white">
+                Monto
+              </label>
+              <input
+                type="number"
+                name="amount"
+                value={bookingData.amount}
+                onChange={handleInputChange}
+                className="bg-gray-700 border border-gray-600 text-white rounded-lg w-full p-2.5"
+                required
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-white">
+                Fecha de pago
+              </label>
+              <input
+                type="date"
+                name="paymentDate"
+                value={bookingData.paymentDate}
+                onChange={handleInputChange}
+                className="bg-gray-700 border border-gray-600 text-white rounded-lg w-full p-2.5"
+                required
+                min={today}
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-white">
+                Método de pago
+              </label>
+              <select
+                name="paymentMethod"
+                value={bookingData.paymentMethod}
+                onChange={handleInputChange}
+                className="bg-gray-700 border border-gray-600 text-white rounded-lg w-full p-2.5"
+                required
+              >
+                <option value="">Seleccione un método</option>
+                <option value="tarjeta">Tarjeta</option>
+                <option value="efectivo">Efectivo</option>
+                <option value="transferencia">Transferencia</option>
+              </select>
+            </div>
+          </>
+        )} 
 
         <div className="flex justify-between">
           <button
