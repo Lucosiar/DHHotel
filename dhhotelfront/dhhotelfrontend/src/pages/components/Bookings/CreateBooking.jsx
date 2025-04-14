@@ -2,6 +2,9 @@ import React, { useState, useEffect } from "react";
 
 const CreateBooking = ({ onClose, onBookingCreated }) => {
   const [clients, setClients] = useState([]);
+  const [users, setUsers] = useState([]);
+  const [searchClient, setSearchClient] = useState("");
+
   const [rooms, setRooms] = useState([]);
   const [bookingData, setBookingData] = useState({
     startDate: "",
@@ -23,19 +26,36 @@ const CreateBooking = ({ onClose, onBookingCreated }) => {
 
   useEffect(() => {
     fetchBookings();
+    fetchUsers();
     fetchClients();
     fetchRooms();
   }, []);
+
+  const fetchUsers = async () => {
+    try {
+      const response = await fetch("http://127.0.0.1:8000/api/users/");
+      const data = await response.json();
+      setUsers(data);
+    } catch (error) {
+      console.error("Error fetching users:", error);
+    }
+  };
 
   const fetchClients = async () => {
     try {
       const response = await fetch("http://127.0.0.1:8000/api/clients/");
       const data = await response.json();
       setClients(data);
+      setFilteredClients(data);
     } catch (error) {
       console.error("Error fetching clients:", error);
     }
   };
+
+  const filteredClients = clients.filter((client) => {
+    const fullName = `${client.user.name} ${client.lastName} ${client.user.email}`.toLowerCase();
+    return fullName.includes(searchClient.toLowerCase());
+  });
 
   const fetchRooms = async () => {
     try {
@@ -72,17 +92,40 @@ const CreateBooking = ({ onClose, onBookingCreated }) => {
   
       return updatedData;
     });
+
+    console.log("Campos ${name}:, ${value}");
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+  
+    if (!bookingData.clientId || !bookingData.roomId) {
+      alert("Debe seleccionar un cliente y una habitación.");
+      return;
+    }
   
     if (bookingData.state === "confirmada" && !bookingData.paymentDone) {
       alert("El pago debe estar realizado para confirmar la reserva.");
       return;
     }
   
-    console.log("Enviando datos al backend:", JSON.stringify(bookingData, null, 2));
+    const requestData = {
+      startDate: bookingData.startDate,
+      endDate: bookingData.endDate,
+      state: bookingData.state,
+      idClientFK: parseInt(bookingData.clientId),
+      idRoomFK: parseInt(bookingData.roomId),
+    };
+  
+    if (bookingData.paymentDone) {
+      requestData.payment = {
+        amount: bookingData.amount,
+        paymentDate: bookingData.paymentDate,
+        paymentMethod: bookingData.paymentMethod,
+      };
+    }
+  
+    console.log("📤 Enviando datos al backend:", JSON.stringify(requestData, null, 2));
   
     try {
       const response = await fetch("http://127.0.0.1:8000/api/bookings/create_booking/", {
@@ -90,22 +133,21 @@ const CreateBooking = ({ onClose, onBookingCreated }) => {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(bookingData),
+        body: JSON.stringify(requestData),
       });
   
       const data = await response.json();
   
       if (response.ok) {
-        alert("Reserva creada con éxito");
+        alert("✅ Reserva creada con éxito");
       } else {
-        console.error("Error al crear la reserva:", data);
-        alert("Error al crear la reserva: " + JSON.stringify(data, null, 2));
+        console.error("❌ Error al crear la reserva:", data);
+        alert("❌ Error al crear la reserva: " + JSON.stringify(data, null, 2));
       }
     } catch (error) {
-      console.error("Error en la solicitud:", error);
+      console.error("❌ Error en la solicitud:", error);
     }
   };
-  
 
   const today = new Date().toISOString().split("T")[0];
 
@@ -175,6 +217,13 @@ const CreateBooking = ({ onClose, onBookingCreated }) => {
         </div>
         <div>
           <label className="block text-sm font-medium text-white">Cliente</label>
+          <input
+            type="text"
+            placeholder="Buscar cliente..."
+            value={searchClient}
+            onChange={(e) => setSearchClient(e.target.value)}
+            className="bg-gray-700 border border-gray-600 text-white rounded-lg w-full p-2.5 mb-2"
+          />
           <select
             name="clientId"
             value={bookingData.clientId}
@@ -182,9 +231,10 @@ const CreateBooking = ({ onClose, onBookingCreated }) => {
             className="bg-gray-700 border border-gray-600 text-white rounded-lg w-full p-2.5"
             required
           >
-            {clients.map((client) => (
+            <option value="">Seleccione un cliente</option>
+            {filteredClients.map((client) => (
               <option key={client.idClient} value={client.idClient}>
-                {client.firstName} {client.lastName}
+                {user.name} {client.lastName} - {user.email}
               </option>
             ))}
           </select>
@@ -198,6 +248,7 @@ const CreateBooking = ({ onClose, onBookingCreated }) => {
             className="bg-gray-700 border border-gray-600 text-white rounded-lg w-full p-2.5"
             required
           >
+            <option value="">Seleccione una habitación</option> {/* Opción por defecto */}
             {filteredRooms.length > 0 ? (
               filteredRooms.map((room) => (
                 <option key={room.idRoom} value={room.idRoom}>

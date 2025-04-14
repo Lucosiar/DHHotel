@@ -1,14 +1,21 @@
 import React, {useEffect, useState}from "react";
 import { useNavigate } from "react-router-dom";
 import "../assets/css/HomePrincipal.css";
+import Header from "./components/Header.jsx";
+import Footer from "./components/Footer.jsx";
 
 const HomePrincipal = () => {
 
   const [phonePrefixes, setPhonePrefixes] = useState([]);
 
-  const [isScrolled, setIsScrolled] = useState(false);
   const navigate = useNavigate();
 
+  // Rooms
+  const [arrivalDate, setArrivalDate] = useState("");
+  const [departureDate, setDepartureDate] = useState("");
+  const [adults, setAdults] = useState(1);
+
+  // Formulario reserva
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -36,6 +43,30 @@ const HomePrincipal = () => {
     }
   };
 
+  // Rooms
+  const handleArrivalDateChange = (e) => {
+    const newArrivalDate = e.target.value;
+    setArrivalDate(newArrivalDate);
+
+    // Establecer el valor mínimo de la fecha de salida
+    const departureDateInput = document.getElementById('departure_date');
+    departureDateInput.min = newArrivalDate;
+
+    // Si la fecha de salida es anterior a la fecha de llegada, la resetamos
+    if (departureDateInput.value < newArrivalDate) {
+      setDepartureDate(""); // También actualizamos el estado de la fecha de salida
+    }
+  };
+
+  const handleDepartureDateChange = (e) => setDepartureDate(e.target.value);
+  const handleAdultsChange = (e) => setAdults(e.target.value);
+
+  const handleSearch = () => {
+    navigate("/search_room", {
+      state: {arrivalDate, departureDate, adults},
+    })
+  }
+
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData((prevData) => ({
@@ -60,62 +91,20 @@ const HomePrincipal = () => {
       .split('/').reverse().join('-');
     document.getElementById("arrival_date").value = formattedDate;
 
-    // detectar scroll
-    const handleScroll = () => {
-      if (window.scrollY > 50) {
-        setIsScrolled(true);
-      } else {
-        setIsScrolled(false);
-      }
-    };
-
-    // Añadir el evento scroll
-    window.addEventListener("scroll", handleScroll);
-
-    // Limpiar el evento cuando el componente se desmonta
-    return () => {
-      window.removeEventListener("scroll", handleScroll);
-    };
   }, []);
-  
 
   return (
-  <div className="relative min-h-screen">
-    <div className="absolute inset-0 opacity-50 z-0 background-image">
-        <img src="/src/assets/img/pruebaCanva.jpg" alt="Background Image" className="object-cover object-center w-full h-full" />
+  <div className="min-h-screen flex flex-col">
+    <div className="absolute left-0 w-full h-full opacity-50 z-0">
+      <img 
+        src="/img/pruebaCanva.jpg" 
+        alt="Background" 
+        className="w-full h-full object-cover object-center"
+      />
     </div>
 
-    <header className={
-      `sticky top-0 w-full flex justify-between items-center p-4 z-50 transition-all duration-300 ${
-        isScrolled ? "bg-indigo-500" : "bg-transparent"
-      }`}>
-      <div>
-        <a href="#" className="flex items-center ml-2">
-          <img
-            rel="icon"
-            src="/src/assets/img/serpienteMorada.ico"
-            alt="Logo"
-            className="h-10 w-10 ml-2"
-          />
-          <span className="text-3xl font-bold ml-2 mt-2 The_Last_Shuriken_leter">DH Lucosiar</span>
-        </a>
-      </div>
-      <nav className="flex space-x-4 mr-4">
-        <ul className="flex items-center space-x-8 h-10">
-          <li><a href="#rooms" className="hover:text-primary transition-colors duration-300 text-xl">Habitaciones</a></li>
-          <li><a href="#contact" className="hover:text-primary transition-colors duration-300 text-xl">Reservas</a></li>
-          <li><a href="#contact" className="hover:text-primary transition-colors duration-300 text-xl">Contacto</a></li>
-          <li>
-            <button onClick={handleLogin} 
-            className={`text-white border border-gray-300 px-4 py-1 text-xl cursor-pointer rounded-md hover:bg-orange-600 transition-colors duration-600 ${
-            isScrolled ? "bg-indigo-800 border-indigo-800" : "bg-transparent"
-            }`}>
-              Iniciar Sesión
-            </button>
-          </li>
-        </ul>
-      </nav>
-    </header>
+    
+    <Header />
 
     <main className="home-main">
       <section id="home-principal">
@@ -136,19 +125,25 @@ const HomePrincipal = () => {
               type="date"
               placeholder="Fecha de llegada" 
               id="arrival_date"
-              min={new Date().toISOString().split("T")[0]}/>
+              min={new Date().toISOString().split("T")[0]}
+              onChange={handleArrivalDateChange}
+              />
             <input 
               type="date"
               placeholder="Fecha de salida" 
               id="departure_date"
-              min={new Date().toISOString().split("T")[0]}/>
+              min={new Date().toISOString().split("T")[0]}
+              onChange={handleDepartureDateChange}
+              />
             <input 
               type="number" 
               placeholder="Adultos" 
               id="adults" 
-              min="1" max="8"/>
+              min="1" max="8"
+              onChange={handleAdultsChange}
+              />
           </div>  
-          <button className="bg-indigo-700">Buscar</button>
+          <button className="bg-indigo-700" onClick={handleSearch}>Buscar</button>
         </div>
       </section>
 
@@ -159,22 +154,22 @@ const HomePrincipal = () => {
           Bienvenido a nuestro hotel
         </h1>
         <div className="flex items-center justify-center space-x-6 mb-7">
-          <img src="/src/assets/img/pruebaCanva.jpg" alt="Hotel" className="w-1/4 rounded-lg"/>
+          <img src="/img/pruebaCanva.jpg" alt="Hotel" className="w-1/4 rounded-lg"/>
           <p className="text-black max-w-md">DH Es un hotel familiar que desea atender y ofrecer a sus huéspedes una hospitalidad personalizada. Aunque nuestro objetivo es ofrecerle una experiencia auténtica siempre que se aloje con nosotros, también garantizamos un alto nivel de comodidad y servicios para que puedan disfrutar de sus vacaciones. Nuestro equipo está comprometido con la calidad de nuestra atención. Nos esforzamos por ofrecer un servicio de calidad que nos ayude a disfrutar de sus vacaciones.</p>
         </div>
         <div>
           <h3 className="The_Last_Shuriken_leter mb-4">Para que disfrutes cada momento a nuestro lado te queremos ofrecer lo mejor.</h3>
           <div className="flex items-center justify-center gap-6 mb-5">
             <div className="flex flex-col items-center text-center">
-                <img src="/src/assets/img/bandeja.png" alt="room" className="w-12 h-12  mt-4 mb-5"/>
+                <img src="/img/bandeja.png" alt="room" className="w-12 h-12  mt-4 mb-5"/>
                 <p>Servicio de habitaciones</p>
             </div>
             <div className="flex flex-col items-center text-center">
-                <img src="/src/assets/img/restaurante.png" alt="room" className="w-12 h-12 mt-4 mb-5"/>
+                <img src="/img/restaurante.png" alt="room" className="w-12 h-12 mt-4 mb-5"/>
                 <p>Cafetería y restaurante</p>
             </div>
             <div className="flex flex-col items-center text-center">
-                <img src="/src/assets/img/24horas.png" alt="room" className="w-12 h-12 mt-4 mb-5"/>
+                <img src="/img/24horas.png" alt="room" className="w-12 h-12 mt-4 mb-5"/>
                 <p>Recepción 24h</p>
             </div>
           </div>
@@ -190,13 +185,13 @@ const HomePrincipal = () => {
             <div className="button-overlay">
               <button onClick={handleLogin} className="reserve-button">Reservar</button>
             </div>
-            <img src="/src/assets/img/habitacion_simple_2camas.jpg" alt="room" className="size-image_room"/>
+            <img src="/img/habitacion_simple_2camas.jpg" alt="room" className="size-image_room"/>
             <h3 className="text-center mt-2">Habitación simple</h3>
             <h4 className="text-center">Desde 11€\noche</h4>
           </div>
 
           <div className="room-container relative">
-            <img src="/src/assets/img/habitacion_doble.jpg" alt="room" className="size-image_room"/>
+            <img src="/img/habitacion_doble.jpg" alt="room" className="size-image_room"/>
             <div className="button-overlay">
               <button onClick={handleLogin}  className="reserve-button">Reservar</button>
             </div>
@@ -205,7 +200,7 @@ const HomePrincipal = () => {
           </div>
 
           <div className="room-container relative">
-            <img src="/src/assets/img/habitacion_suite.jpg" alt="room" className="size-image_room"/>
+            <img src="/img/habitacion_suite.jpg" alt="room" className="size-image_room"/>
             <div className="button-overlay">
               <button onClick={handleLogin}  className="reserve-button">Reservar</button>
             </div>
@@ -287,19 +282,19 @@ const HomePrincipal = () => {
             <p className="text-sm max-w-xs break-words">Contacta con nosotros usando el formulario o contactanos por teléfono o correo.</p>
             <div className="flex items-center">
               <img 
-                src="/src/assets/img/email.png" alt="phone" className="w-6 h-6 mr-2">
+                src="/img/email.png" alt="phone" className="w-6 h-6 mr-2">
               </img>
               <p>example@example.com</p>
             </div>
             <div className="flex items-center">
               <img 
-                src="/src/assets/img/llamar.png" alt="phone" className="w-6 h-6 mr-2">
+                src="/img/llamar.png" alt="phone" className="w-6 h-6 mr-2">
               </img>
               <p>+34 666 66 66 66</p>
             </div>
             <div className="flex items-center">
               <img 
-                src="/src/assets/img/ubicacion.png" alt="phone" className="w-6 h-6 mr-2">
+                src="/img/ubicacion.png" alt="phone" className="w-6 h-6 mr-2">
               </img>
               <p>España</p>
             </div>
@@ -354,58 +349,10 @@ const HomePrincipal = () => {
         </ul>
         <p class="text-lg text-black flex mb-4 px-3">Esta página web ha sido creada por Lucía. El back está hecho con Django y el front con React con Vite y TailwindCSS. Está página web funciona como landing page pero en caso de tener el back es una página totalmente funcional para gestionar un hotel. Puedes reservar habitaciones, ver las ofertas, contactar con nosotros y más. Para más información de la programadora están los enlaces directos junto con el portfolio en caso de querer ver más proyectos.</p>
       </div>*/}
-
-
-      <div className="about-us relative z-10 bg-indigo-300">
-        <h1 className="The_Last_Shuriken_leter">DH Lucosiar</h1>
-        <div className="menu_footer">
-          <ul className="flex justify-center gap-6 list-none p-0 mb-4 text-gray-800">
-            <li><a href="#home-principal" className="hover:text-primary transition-colors duration-300">Inicio</a></li>
-            <li><a href="#rooms" className="hover:text-primary transition-colors duration-300 ">Habitaciones</a></li>
-            <li><a href="#" className="hover:text-primary transition-colors duration-300">Reservas</a></li>
-            <li><a href="#contact" className="hover:text-primary transition-colors duration-300">Contacto</a></li>
-          </ul>
-
-          <div className="flex justify-center mb-5">
-            <div className="grid grid-cols-2 w-1xl gap-10"> 
-              <div className="resources-container">
-                <h2 className="mb-6 text-sm font-semibold text-black uppercase">Resources</h2>
-                <ul className="text-gray-800 font-medium">
-                  <li className="mb-4">
-                    <a href="https://flowbite.com/" className="hover:underline">Flowbite</a>
-                  </li>
-                  <li className="mb-4">
-                    <a href="https://tailwindcss.com/" className="hover:underline">Tailwind CSS</a>
-                  </li>
-                  <li>
-                    <a href="https://www.djangoproject.com/" className="hover:underline">Django</a>
-                  </li>
-                </ul>
-              </div>
-
-              <div className="resources-container">
-                <h2 className="mb-6 text-sm font-semibold text-black uppercase">Follow me</h2>
-                <ul className="text-gray-800 font-medium">
-                  <li className="mb-4">
-                    <a href="https://github.com/themesberg/flowbite" className="hover:underline ">Github</a>
-                  </li>
-                  <li className="mb-4">
-                    <a href="www.linkedin.com/in/lucia-cosio-artime-c16012022" className="hover:underline">Linkedin</a>
-                  </li>
-                  <li>
-                    <a href="https://www.kaggle.com/lcosioa" className="hover:underline">Kaggle</a>
-                  </li>
-                </ul>
-              </div>              
-            </div>
-
-          </div>
-          <p className="text-sm mt-4 mb-2">
-              &copy; 2025 Lucosiar&reg; - Todos los derechos reservados
-          </p>
-        </div>
-      </div>
     </main>
+
+    <Footer />
+
   </div>
   );
 };

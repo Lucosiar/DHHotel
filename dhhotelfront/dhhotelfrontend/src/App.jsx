@@ -7,6 +7,7 @@ import HomeAdmin from "./pages/Home/HomeAdmin.jsx";
 import SingUp from "./pages/Registration/SingUp.jsx";
 
 import './assets/css/fonts.css'
+import SearchRoom from './pages/components/Rooms/SearchRoom.jsx';
 
 
 function App() {
@@ -15,6 +16,7 @@ function App() {
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<HomePrincipal />} />
+          <Route path="/search_room" element={<SearchRoom />} />
           <Route path="/login" element={<Login />} />
           <Route path="/admin" element={<HomeAdmin />} />
           <Route path="/client" element={<HomeClient />} />
