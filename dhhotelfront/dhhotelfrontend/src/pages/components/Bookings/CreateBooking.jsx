@@ -2,10 +2,14 @@ import React, { useState, useEffect } from "react";
 
 const CreateBooking = ({ onClose, onBookingCreated }) => {
   const [clients, setClients] = useState([]);
-  const [users, setUsers] = useState([]);
   const [searchClient, setSearchClient] = useState("");
+  const [filteredClients, setFilteredClients] = useState([]);
+
+  const [numGuests, setNumGuests] = useState(1);
 
   const [rooms, setRooms] = useState([]);
+  const [filteredRooms, setFilteredRooms] = useState([]);
+  const [bookings, setBookings] = useState([]);
   const [bookingData, setBookingData] = useState({
     startDate: "",
     endDate: "",
@@ -19,32 +23,27 @@ const CreateBooking = ({ onClose, onBookingCreated }) => {
     paymentId: "",
   });
 
-  const [bookings, setBookings] = useState([]);
-  const [filteredRooms, setFilteredRooms] = useState([]);
-
   const [errorMessage, setErrorMessage] = useState("");
+
+  const capitalize = (str) => str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
 
   useEffect(() => {
     fetchBookings();
-    fetchUsers();
     fetchClients();
     fetchRooms();
   }, []);
 
-  const fetchUsers = async () => {
-    try {
-      const response = await fetch("http://127.0.0.1:8000/api/users/");
-      const data = await response.json();
-      setUsers(data);
-    } catch (error) {
-      console.error("Error fetching users:", error);
-    }
-  };
+  useEffect(() => {
+    filterAvailableRooms(bookingData.startDate, bookingData.endDate);
+  }, [numGuests]);
+
 
   const fetchClients = async () => {
     try {
-      const response = await fetch("http://127.0.0.1:8000/api/clients/");
+      const response = await fetch("http://127.0.0.1:8000/api/users/clients/");
       const data = await response.json();
+      console.log("Datos de clientes recibidos:", data);
+
       setClients(data);
       setFilteredClients(data);
     } catch (error) {
@@ -52,16 +51,12 @@ const CreateBooking = ({ onClose, onBookingCreated }) => {
     }
   };
 
-  const filteredClients = clients.filter((client) => {
-    const fullName = `${client.user.name} ${client.lastName} ${client.user.email}`.toLowerCase();
-    return fullName.includes(searchClient.toLowerCase());
-  });
-
   const fetchRooms = async () => {
     try {
       const response = await fetch("http://127.0.0.1:8000/api/rooms/");
       const data = await response.json();
       setRooms(data);
+      setFilteredRooms(data);
     } catch (error) {
       console.error("Error fetching rooms:", error);
     }
@@ -85,6 +80,10 @@ const CreateBooking = ({ onClose, onBookingCreated }) => {
         ...prevData,
         [name]: type === "checkbox" ? checked : value,
       };
+
+      if (name === "paymentDone" && checked) {
+        updatedData.state = "confirmada";
+      }
   
       if (name === "startDate" || name === "endDate") {
         filterAvailableRooms(updatedData.startDate, updatedData.endDate);
@@ -93,7 +92,7 @@ const CreateBooking = ({ onClose, onBookingCreated }) => {
       return updatedData;
     });
 
-    console.log("Campos ${name}:, ${value}");
+    console.log(`Campo ${name}: ${value}`);
   };
 
   const handleSubmit = async (e) => {
@@ -113,7 +112,7 @@ const CreateBooking = ({ onClose, onBookingCreated }) => {
       startDate: bookingData.startDate,
       endDate: bookingData.endDate,
       state: bookingData.state,
-      idClientFK: parseInt(bookingData.clientId),
+      idUser: bookingData.clientId,
       idRoomFK: parseInt(bookingData.roomId),
     };
   
@@ -166,10 +165,17 @@ const CreateBooking = ({ onClose, onBookingCreated }) => {
       }
     });
 
+    const guestAllowedTypes = numGuests === 1 ? ["simple"] : ["doble", "suite"];
+
     const availableRooms = rooms.filter(
-      (room) => !unavailableRooms.has(room.idRoom) && room.state !== "mantenimiento"
+      (room) =>
+        !unavailableRooms.has(room.idRoom) &&
+        room.state !== "mantenimiento" &&
+        room.capacity >= numGuests &&
+        guestAllowedTypes.includes(room.typeRoom.toLowerCase())
     );
 
+  console.log("✅ Habitaciones disponibles:", availableRooms);
     setFilteredRooms(availableRooms);
   };
 
@@ -232,11 +238,22 @@ const CreateBooking = ({ onClose, onBookingCreated }) => {
             required
           >
             <option value="">Seleccione un cliente</option>
-            {filteredClients.map((client) => (
-              <option key={client.idClient} value={client.idClient}>
-                {user.name} {client.lastName} - {user.email}
+            {filteredClients.map((client, index) => (
+              <option key={client.idUser || index} value={client.idUser}>
+                {client.name} {client.lastName} - {client.email}
               </option>
             ))}
+          </select>
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-white">Número de huéspedes</label>
+          <select
+            value={numGuests}
+            onChange={(e) => setNumGuests(parseInt(e.target.value))}
+            className="bg-gray-700 border border-gray-600 text-white rounded-lg w-full p-2.5"
+          >
+            <option value={1}>1</option>
+            <option value={2}>2</option>
           </select>
         </div>
         <div>
@@ -248,11 +265,11 @@ const CreateBooking = ({ onClose, onBookingCreated }) => {
             className="bg-gray-700 border border-gray-600 text-white rounded-lg w-full p-2.5"
             required
           >
-            <option value="">Seleccione una habitación</option> {/* Opción por defecto */}
+            <option value="">Seleccione una habitación</option>
             {filteredRooms.length > 0 ? (
               filteredRooms.map((room) => (
                 <option key={room.idRoom} value={room.idRoom}>
-                  Habitación {room.number}
+                  Habitación {room.number} - {capitalize(room.typeRoom)}
                 </option>
               ))
             ) : (
@@ -323,7 +340,7 @@ const CreateBooking = ({ onClose, onBookingCreated }) => {
               </select>
             </div>
           </>
-        )} 
+        )}
 
         <div className="flex justify-between">
           <button

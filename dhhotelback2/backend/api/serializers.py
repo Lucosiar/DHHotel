@@ -29,16 +29,6 @@ class RoomSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError("El número ya está en uso.")
         return value
 
-class BookingSerializer(serializers.ModelSerializer):
-    user_name = serializers.CharField(source='idClientFK.idUserFK.name', read_only=True)
-    client_lastname = serializers.CharField(source='idClientFK.lastName', read_only=True)
-    room_number = serializers.CharField(source='idRoomFK.number', read_only=True)
-    room_type = serializers.CharField(source='idRoomFK.typeRoom', read_only=True)
-    
-    class Meta:
-        model = Booking
-        fields = '__all__'
-
 class PaymentSerializer(serializers.ModelSerializer):
     user_name = serializers.CharField(source='idBooking.idClientFK.idUserFK.name', read_only=True)
     client_lastname = serializers.CharField(source='idBooking.idClientFK.lastName', read_only=True)
@@ -46,3 +36,16 @@ class PaymentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Payment
         fields = '__all__'
+
+
+class BookingSerializer(serializers.ModelSerializer):
+    idUser = serializers.PrimaryKeyRelatedField(queryset=User.objects.all(), source='user')
+    idRoomFK = serializers.PrimaryKeyRelatedField(queryset=Room.objects.all(), source='room')
+    payment = PaymentSerializer(required=False)
+
+    class Meta:
+        model = Booking
+        fields = [
+            'id', 'startDate', 'endDate', 'state',
+            'idUser', 'idRoomFK', 'payment'
+        ]

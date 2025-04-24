@@ -26,7 +26,7 @@ const HomeAdmin = () => {
           <div className="flex flex-col items-center justify-center text-center">
             <img
               rel="icon"
-              src="/src/assets/img/serpienteMorada.ico"
+              src="img/serpienteMorada.ico"
               alt="Logo"
               className="h-10 w-10"
             />
@@ -37,24 +37,24 @@ const HomeAdmin = () => {
 
         <div className="space-y-5 mt-4">
           <button className="flex items-center w-full text-left p-2 rounded-full hover:bg-indigo-500" onClick={() => setSelectedOption('bookings')}>
-            <img src="/src/assets/img/menu/cita.png" alt="Reservas" className="h-6 w-6 mr-2" />
+            <img src="img/menu/cita.png" alt="Reservas" className="h-6 w-6 mr-2" />
             Gestionar Reservas
           </button>
           <button className="flex items-center w-full text-left p-2 rounded-full hover:bg-indigo-500" onClick={() => setSelectedOption('users')}>
-            <img src="/src/assets/img/menu/usuario.png" alt="Clientes" className="h-6 w-6 mr-2" />
+            <img src="img/menu/usuario.png" alt="Clientes" className="h-6 w-6 mr-2" />
             Gestionar Clientes
           </button>
           <button className="flex items-center w-full text-left p-2 rounded-full hover:bg-indigo-500" onClick={() => setSelectedOption('rooms')}>
-            <img src="/src/assets/img/menu/llave.png" alt="Habitaciones" className="h-6 w-6 mr-2" />
+            <img src="img/menu/llave.png" alt="Habitaciones" className="h-6 w-6 mr-2" />
             Gestionar Habitaciones
           </button>
           <button className="flex items-center w-full text-left p-2 rounded-full hover:bg-indigo-500" onClick={() => setSelectedOption('payments')}>
-            <img src="/src/assets/img/menu/pago.png" alt="Pagos" className="h-6 w-6 mr-2" />
+            <img src="img/menu/pago.png" alt="Pagos" className="h-6 w-6 mr-2" />
             Gestionar Pagos
           </button>
           {role === "superadmin" && (
             <button className="flex items-center w-full text-left p-2 rounded-full hover:bg-indigo-500" onClick={() => alert('Gestionar Administradores')}>
-              <img src="/src/assets/img/menu/apoyo.png" alt="Administradores" className="h-6 w-6 mr-2" />
+              <img src="img/menu/apoyo.png" alt="Administradores" className="h-6 w-6 mr-2" />
               Gestionar Administradores
             </button>
           )}
@@ -63,7 +63,7 @@ const HomeAdmin = () => {
 
       <div className="border-t border-gray-300 pt-4">
         <button className="flex items-center w-full text-left p-2 rounded-full bg-red-600 hover:bg-red-700" onClick={handleLogout}>
-          <img src="/src/assets/img/menu/cerrar-sesion.png" alt="Logout" className="h-6 w-6 mr-2" />
+          <img src="img/menu/cerrar-sesion.png" alt="Logout" className="h-6 w-6 mr-2" />
           Cerrar Sesión
         </button>
       </div>

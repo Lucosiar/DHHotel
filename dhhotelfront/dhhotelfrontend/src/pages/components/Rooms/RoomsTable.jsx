@@ -220,7 +220,7 @@ const RoomsTable = () => {
                     onClick={() => console.log(`Editar habitación ${room.number}`)}
                     className="p-2 bg-blue-700 text-white rounded-full mr-2 hover:bg-blue-600"
                   >
-                    <img src="src/assets/img/acciones/lapiz.png" alt="Editar" className="w-6 h-6" />
+                    <img src="img/acciones/lapiz.png" alt="Editar" className="w-6 h-6" />
                   </button>
                 
                   <button
@@ -230,7 +230,7 @@ const RoomsTable = () => {
                     }}
                     className="p-2 bg-red-700 text-white rounded-full hover:bg-red-600"
                   >
-                    <img src="src/assets/img/acciones/borrar.png" alt="Eliminar" className="w-6 h-6" />
+                    <img src="img/acciones/borrar.png" alt="Eliminar" className="w-6 h-6" />
                   </button>
                   </>
                 )}

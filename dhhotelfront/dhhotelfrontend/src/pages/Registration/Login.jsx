@@ -43,7 +43,7 @@ const Login = () => {
   return (
     <section 
       className="relative bg-cover bg-center h-screen "
-      style={{backgroundImage: 'url("./src/assets/img/bgCanva.jpg")'}}>
+      style={{backgroundImage: 'url("img/bgCanva.jpg")'}}>
         
       <div className="flex flex-col items-center justify-center px-6 py-8 mx-auto md:h-screen lg:py-0">
         <a
@@ -52,7 +52,7 @@ const Login = () => {
         >
           <img
             className="w-8 h-8 mr-2"
-            src="/src/assets/img/serpienteMorada.ico"
+            src="img/serpienteMorada.ico"
             alt="logo"
           />
           DH Lucosiar

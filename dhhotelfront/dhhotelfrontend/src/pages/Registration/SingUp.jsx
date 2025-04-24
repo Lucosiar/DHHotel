@@ -42,11 +42,11 @@ const SingUp = () => {
   return (
     <section
       className="relative bg-cover bg-center h-screen"
-      style={{ backgroundImage: 'url("./src/assets/img/bgCanva.jpg")' }}
+      style={{ backgroundImage: 'url("img/bgCanva.jpg")' }}
     >
       <div className="flex flex-col items-center justify-center px-6 py-8 mx-auto md:h-screen lg:py-0">
         <a href="#" className="flex items-center mb-6 text-2xl font-semibold text-white">
-          <img className="w-8 h-8 mr-2" src="/src/assets/img/serpienteMorada.ico" alt="logo" />
+          <img className="w-8 h-8 mr-2" src="img/serpienteMorada.ico" alt="logo" />
           DH Lucosiar
         </a>
 

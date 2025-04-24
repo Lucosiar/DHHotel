@@ -65,7 +65,7 @@ class Booking(models.Model):
     ]
     
     idBooking = models.AutoField(primary_key=True)
-    idClientFK = models.ForeignKey(Client, on_delete=models.CASCADE, db_column='idClientFK')
+    idUserFK = models.ForeignKey(User, related_name="bookings", on_delete=models.CASCADE)
     idRoomFK = models.ForeignKey(Room, on_delete=models.CASCADE, db_column='idRoomFK')
     startDate = models.DateField()
     endDate = models.DateField()
